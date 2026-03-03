@@ -1,0 +1,1146 @@
+<!doctype html>
+<html lang="et" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tallinna linna äripinnad üürile</title>
+
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            tallinn: {
+              primary: '#0072CE',   // Tallinna korrektne
+              secondary: '#005BA3', // tumedam (hover/gradient)
+              accent: '#0072CE',    // hoian sama, et kõik oleks ühtne
+              light: '#E6F0F8',
+              dark: '#1a1a1a',
+              gray_dark: '#2C2C2C',
+              gray_medium: '#626262',
+              gray_light: '#F5F5F5',
+              gray_border: '#E0E0E0',
+              white: '#FFFFFF'
+            }
+          },
+          fontFamily: {
+            sans: ['"Source Sans Pro"', 'system-ui', 'sans-serif'],
+            display: ['"Playfair Display"', 'system-ui', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html, body { height: 100%; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f5f5f5; border-radius: 3px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    .filter-chip { transition: all 0.2s ease; }
+    .filter-chip:hover { transform: translateY(-1px); }
+
+    .listing-card { transition: all 0.3s ease; }
+    .listing-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,114,206,0.15); }
+
+    .range-slider { -webkit-appearance: none; appearance: none; height: 6px; background: #e2e8f0; border-radius: 3px; }
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      background: #0072CE;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,114,206,0.30);
+    }
+
+    .modal-overlay { backdrop-filter: blur(4px); }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fadeIn 0.25s ease forwards; }
+
+    .status-badge { font-size: 0.72rem; padding: 0.25rem 0.55rem; }
+  </style>
+</head>
+
+<body class="h-full bg-tallinn-gray_light font-sans text-tallinn-gray_dark">
+  <!-- Header -->
+  <header class="bg-tallinn-white border-b border-tallinn-gray_border sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-tallinn-primary rounded flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6.9 3.45L12 11.09 5.1 7.63 12 4.18zM4 8.82l7 3.5v7.36l-7-3.5V8.82zm9 10.86v-7.36l7-3.5v7.36l-7 3.5z" />
+            </svg>
+          </div>
+          <div>
+            <span class="font-bold text-tallinn-gray_dark text-lg">TALLINN</span>
+            <span class="text-xs text-tallinn-gray_medium block -mt-1">Äripinnad</span>
+          </div>
+        </div>
+
+        <!-- Desktop Nav -->
+        <nav class="hidden lg:flex items-center gap-1">
+          <a href="#listings" class="px-4 py-2 text-sm font-semibold text-tallinn-primary hover:bg-tallinn-light rounded transition">Vabad pinnad</a>
+          <a href="#how-to" class="px-4 py-2 text-sm font-semibold text-tallinn-gray_dark hover:bg-tallinn-gray_light rounded transition">Kuidas üürida</a>
+          <a href="#terms" class="px-4 py-2 text-sm font-semibold text-tallinn-gray_dark hover:bg-tallinn-gray_light rounded transition">Tingimused</a>
+          <a href="#contact" class="px-4 py-2 text-sm font-semibold text-tallinn-gray_dark hover:bg-tallinn-gray_light rounded transition">Kontakt</a>
+          <a href="#faq" class="px-4 py-2 text-sm font-semibold text-tallinn-gray_dark hover:bg-tallinn-gray_light rounded transition">KKK</a>
+        </nav>
+
+        <!-- CTA + Mobile -->
+        <div class="flex items-center gap-3">
+          <button onclick="openContactModal()" id="header-cta"
+            class="bg-tallinn-primary hover:bg-tallinn-secondary text-white px-5 py-2.5 rounded font-semibold text-sm shadow-md hover:shadow-lg transition hidden sm:flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Esita üüripäring
+          </button>
+
+          <button onclick="toggleMobileMenu()" class="lg:hidden p-2 text-tallinn-gray_dark hover:bg-tallinn-gray_light rounded" aria-label="Ava menüü">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="lg:hidden hidden border-t border-tallinn-gray_border bg-tallinn-white">
+      <nav class="px-4 py-3 space-y-1">
+        <a href="#listings" class="block px-4 py-2.5 text-sm font-semibold text-tallinn-primary bg-tallinn-light rounded">Vabad pinnad</a>
+        <a href="#how-to" class="block px-4 py-2.5 text-sm font-semibold text-tallinn-gray_dark hover:bg-tallinn-gray_light rounded">Kuidas üürida</a>
+        <a href="#terms" class="block px-4 py-2.5 text-sm font-semibold text-tallinn-gray_dark hover:bg-tallinn-gray_light rounded">Tingimused</a>
+        <a href="#contact" class="block px-4 py-2.5 text-sm font-semibold text-tallinn-gray_dark hover:bg-tallinn-gray_light rounded">Kontakt</a>
+        <a href="#faq" class="block px-4 py-2.5 text-sm font-semibold text-tallinn-gray_dark hover:bg-tallinn-gray_light rounded">KKK</a>
+        <button onclick="openContactModal()" class="w-full mt-2 bg-tallinn-primary hover:bg-tallinn-secondary text-white px-4 py-2.5 rounded font-semibold text-sm transition">
+          Esita üüripäring
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="bg-gradient-to-br from-tallinn-primary to-tallinn-secondary text-white py-12 lg:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="max-w-3xl">
+        <h1 id="hero-title" class="text-4xl sm:text-5xl lg:text-6xl font-display font-bold mb-4 leading-tight">
+          Tallinna linna äripinnad üürile
+        </h1>
+        <p id="hero-subtitle" class="text-lg sm:text-xl text-white/85 mb-8 leading-relaxed">
+          Sirvi vabu ja peagi vabanevaid äripindu. Kui leiad sobiva, esita päring otse linnale.
+        </p>
+
+        <!-- Search -->
+        <div class="bg-white rounded shadow-lg p-2 mb-6">
+          <div class="flex flex-col sm:flex-row gap-2">
+            <div class="flex-1 relative">
+              <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-tallinn-gray_medium" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input type="text" id="search-input" placeholder="Aadress / linnaosa / märksõna"
+                class="w-full pl-12 pr-4 py-3 text-tallinn-gray_dark rounded border-0 focus:ring-2 focus:ring-tallinn-primary outline-none">
+            </div>
+            <button onclick="applySearch()"
+              class="bg-tallinn-primary hover:bg-tallinn-secondary text-white px-8 py-3 rounded font-semibold transition flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              Otsi
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick filters -->
+        <div class="flex flex-wrap gap-2">
+          <button onclick="toggleQuickFilter('available')" data-filter="available"
+            class="filter-chip bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm border border-white/30 flex items-center gap-2">
+            <span class="w-2 h-2 bg-white rounded-full"></span> Kohe vaba
+          </button>
+
+          <button onclick="toggleQuickFilter('upcoming')" data-filter="upcoming"
+            class="filter-chip bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm border border-white/30 flex items-center gap-2">
+            <span class="w-2 h-2 bg-white/90 rounded-full"></span> Vabaneb peagi
+          </button>
+
+          <button onclick="toggleQuickFilter('teenindus')" data-filter="teenindus"
+            class="filter-chip bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm border border-white/30">
+            Teenindus
+          </button>
+
+          <button onclick="toggleQuickFilter('büroo')" data-filter="büroo"
+            class="filter-chip bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm border border-white/30">
+            Büroo
+          </button>
+
+          <button onclick="toggleQuickFilter('ladu')" data-filter="ladu"
+            class="filter-chip bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm border border-white/30">
+            Ladu
+          </button>
+
+          <button onclick="toggleQuickFilter('toitlustus')" data-filter="toitlustus"
+            class="filter-chip bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm border border-white/30">
+            Toitlustus
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main -->
+  <main id="listings" class="max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full">
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Filters -->
+      <aside class="lg:w-72 flex-shrink-0">
+        <div class="bg-tallinn-white rounded shadow-sm border border-tallinn-gray_border p-5 lg:sticky lg:top-24 custom-scrollbar lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="font-semibold text-lg text-tallinn-gray_dark">Filtrid</h2>
+            <button onclick="clearAllFilters()" class="text-sm text-tallinn-primary hover:underline">Tühjenda</button>
+          </div>
+
+          <!-- District -->
+          <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
+            <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Linnaosa</h3>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="kesklinn" onchange="applyFilters()"
+                  class="filter-district w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Kesklinn</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="põhja-tallinn" onchange="applyFilters()"
+                  class="filter-district w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Põhja-Tallinn</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="kristiine" onchange="applyFilters()"
+                  class="filter-district w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Kristiine</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="lasnamäe" onchange="applyFilters()"
+                  class="filter-district w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Lasnamäe</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="mustamäe" onchange="applyFilters()"
+                  class="filter-district w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Mustamäe</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Area -->
+          <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
+            <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Pindala (m²)</h3>
+            <div class="space-y-3">
+              <div class="flex items-center gap-3">
+                <input type="number" id="area-min" placeholder="Min"
+                  class="w-full px-3 py-2 text-sm border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none"
+                  onchange="applyFilters()">
+                <span class="text-tallinn-gray_medium">–</span>
+                <input type="number" id="area-max" placeholder="Max"
+                  class="w-full px-3 py-2 text-sm border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none"
+                  onchange="applyFilters()">
+              </div>
+              <input type="range" min="0" max="1000" value="1000" class="range-slider w-full" id="area-slider">
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
+            <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Hind (€/m²)</h3>
+            <div class="flex items-center gap-3">
+              <input type="number" id="price-min" placeholder="Min"
+                class="w-full px-3 py-2 text-sm border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none"
+                onchange="applyFilters()">
+              <span class="text-tallinn-gray_medium">–</span>
+              <input type="number" id="price-max" placeholder="Max"
+                class="w-full px-3 py-2 text-sm border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none"
+                onchange="applyFilters()">
+            </div>
+          </div>
+
+          <!-- Purpose -->
+          <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
+            <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Otstarve</h3>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="teenindus" onchange="applyFilters()"
+                  class="filter-purpose w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Teenindus</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="kaubandus" onchange="applyFilters()"
+                  class="filter-purpose w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Kaubandus</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="büroo" onchange="applyFilters()"
+                  class="filter-purpose w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Büroo</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="ladu" onchange="applyFilters()"
+                  class="filter-purpose w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Ladu</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="toitlustus" onchange="applyFilters()"
+                  class="filter-purpose w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Toitlustus</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Condition -->
+          <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
+            <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Seisukord</h3>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="valmis" onchange="applyFilters()"
+                  class="filter-condition w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Valmis sissekolimiseks</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="osaliselt" onchange="applyFilters()"
+                  class="filter-condition w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Osaliselt renoveeritud</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="remont" onchange="applyFilters()"
+                  class="filter-condition w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Remonti vajab</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Availability -->
+          <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
+            <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Saadavus</h3>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="kohe" onchange="applyFilters()"
+                  class="filter-availability w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Kohe vaba</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" value="peagi" onchange="applyFilters()"
+                  class="filter-availability w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Vabaneb peagi</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Floor + features -->
+          <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
+            <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Korrus</h3>
+            <select id="filter-floor" onchange="applyFilters()"
+              class="w-full px-3 py-2 text-sm border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
+              <option value="">Kõik korrused</option>
+              <option value="kelder">Kelder</option>
+              <option value="1">1. korrus</option>
+              <option value="2">2. korrus</option>
+              <option value="3+">3+ korrus</option>
+            </select>
+
+            <div class="mt-3 space-y-2">
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" id="filter-separate-entrance" onchange="applyFilters()"
+                  class="w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Eraldi sissepääs</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" id="filter-accessible" onchange="applyFilters()"
+                  class="w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Ligipääsetav</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Transport -->
+          <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input type="checkbox" id="filter-transport" onchange="applyFilters()"
+                class="w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+              <span class="text-sm font-semibold text-tallinn-gray_dark group-hover:text-tallinn-primary">Ühistransport lähedal</span>
+            </label>
+          </div>
+
+          <!-- Year -->
+          <div>
+            <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Ehitusaasta</h3>
+            <select id="filter-year" onchange="applyFilters()"
+              class="w-full px-3 py-2 text-sm border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
+              <option value="">Kõik</option>
+              <option value="enne1940">Enne 1940</option>
+              <option value="1940-1990">1940–1990</option>
+              <option value="1991-2010">1991–2010</option>
+              <option value="2011+">2011+</option>
+            </select>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Results -->
+      <section class="flex-1 min-w-0">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="font-display font-bold text-2xl text-tallinn-gray_dark">Vabad äripinnad</h2>
+            <p id="results-count" class="text-sm text-tallinn-gray_medium mt-1">0 kuulutust leitud</p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <select id="sort-select" onchange="sortListings()"
+              class="px-4 py-2 text-sm border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
+              <option value="newest">Uuemad enne</option>
+              <option value="price-asc">Hind ↑</option>
+              <option value="price-desc">Hind ↓</option>
+              <option value="area-asc">Pindala ↑</option>
+              <option value="area-desc">Pindala ↓</option>
+              <option value="available">Vabanemise kuupäev</option>
+            </select>
+
+            <div class="flex items-center bg-tallinn-gray_light rounded p-1">
+              <button onclick="setView('list')" id="view-list"
+                class="px-3 py-1.5 text-sm font-semibold rounded bg-white shadow text-tallinn-primary transition" aria-label="Loendivaade">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+              </button>
+              <button onclick="setView('map')" id="view-map"
+                class="px-3 py-1.5 text-sm font-semibold rounded text-tallinn-gray_medium hover:text-tallinn-primary transition" aria-label="Kaardivaade">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Map View -->
+        <div id="map-view" class="hidden mb-6">
+          <div class="bg-gradient-to-br from-tallinn-light to-tallinn-gray_light rounded h-96 flex items-center justify-center relative overflow-hidden">
+            <div class="relative text-center p-6 bg-white/90 backdrop-blur rounded shadow-lg">
+              <svg class="w-12 h-12 text-tallinn-primary mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <p class="text-tallinn-primary font-semibold">Tallinna äripindade kaart</p>
+              <p class="text-sm text-tallinn-gray_medium mt-1">Kaardi integreerimine (placeholder)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Listings -->
+        <div id="listings-grid" class="grid gap-6"></div>
+
+        <div class="text-center mt-8">
+          <button class="px-8 py-3 border-2 border-tallinn-primary text-tallinn-primary hover:bg-tallinn-primary hover:text-white rounded font-semibold transition">
+            Näita rohkem
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- How-to -->
+  <section id="how-to" class="bg-tallinn-white py-16 border-t border-tallinn-gray_border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-display font-bold text-tallinn-gray_dark mb-4">Kuidas üürida?</h2>
+        <p class="text-tallinn-gray_medium max-w-2xl mx-auto">Tallinna linnalt äripinna üürimine on lihtne neljasammuline protsess</p>
+      </div>
+
+      <div class="grid md:grid-cols-4 gap-8">
+        <div class="text-center group">
+          <div class="w-16 h-16 bg-tallinn-light text-tallinn-primary rounded flex items-center justify-center mx-auto mb-4 group-hover:bg-tallinn-primary group-hover:text-white transition">
+            🔎
+          </div>
+          <div class="w-8 h-8 bg-tallinn-primary text-white rounded-full flex items-center justify-center mx-auto mb-3 text-sm font-bold">1</div>
+          <h3 class="font-semibold text-tallinn-gray_dark mb-2">Sirvi</h3>
+          <p class="text-sm text-tallinn-gray_medium">Tutvu vabade pindadega ja kasuta filtreid sobiva leidmiseks</p>
+        </div>
+
+        <div class="text-center group">
+          <div class="w-16 h-16 bg-tallinn-light text-tallinn-primary rounded flex items-center justify-center mx-auto mb-4 group-hover:bg-tallinn-primary group-hover:text-white transition">
+            📄
+          </div>
+          <div class="w-8 h-8 bg-tallinn-primary text-white rounded-full flex items-center justify-center mx-auto mb-3 text-sm font-bold">2</div>
+          <h3 class="font-semibold text-tallinn-gray_dark mb-2">Vali pind</h3>
+          <p class="text-sm text-tallinn-gray_medium">Vaata detaile ja vali sobiv pind</p>
+        </div>
+
+        <div class="text-center group">
+          <div class="w-16 h-16 bg-tallinn-light text-tallinn-primary rounded flex items-center justify-center mx-auto mb-4 group-hover:bg-tallinn-primary group-hover:text-white transition">
+            ✉️
+          </div>
+          <div class="w-8 h-8 bg-tallinn-primary text-white rounded-full flex items-center justify-center mx-auto mb-3 text-sm font-bold">3</div>
+          <h3 class="font-semibold text-tallinn-gray_dark mb-2">Esita päring</h3>
+          <p class="text-sm text-tallinn-gray_medium">Täida päringuvorm ja saada see otse linnale</p>
+        </div>
+
+        <div class="text-center group">
+          <div class="w-16 h-16 bg-tallinn-light text-tallinn-primary rounded flex items-center justify-center mx-auto mb-4 group-hover:bg-tallinn-primary group-hover:text-white transition">
+            ✅
+          </div>
+          <div class="w-8 h-8 bg-tallinn-primary text-white rounded-full flex items-center justify-center mx-auto mb-3 text-sm font-bold">4</div>
+          <h3 class="font-semibold text-tallinn-gray_dark mb-2">Leping</h3>
+          <p class="text-sm text-tallinn-gray_medium">Läbirääkimised ja lepingu sõlmimine linnaga</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust/terms -->
+  <section id="terms" class="bg-tallinn-light py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="bg-tallinn-white rounded shadow-sm flex flex-col md:flex-row items-center gap-8 p-8">
+        <div class="flex-shrink-0">
+          <div class="w-20 h-20 bg-tallinn-primary rounded flex items-center justify-center">
+            <span class="text-white text-3xl">🏛️</span>
+          </div>
+        </div>
+
+        <div class="flex-1 text-center md:text-left">
+          <h3 class="text-xl font-semibold text-tallinn-gray_dark mb-2">Üürileandja: Tallinna linn</h3>
+          <p class="text-tallinn-gray_medium mb-4">
+            Kõik siinsed äripinnad kuuluvad Tallinna linnale. Üürilepingud sõlmitakse vastavalt linna kehtestatud tingimustele.
+          </p>
+          <a href="#" class="text-tallinn-primary hover:underline font-semibold inline-flex items-center gap-1">
+            Tutvu üldtingimustega
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+
+        <div class="flex gap-6">
+          <div class="text-center">
+            <div class="text-3xl font-bold text-tallinn-primary">50+</div>
+            <div class="text-sm text-tallinn-gray_medium">Vaba pinda</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-tallinn-primary">8</div>
+            <div class="text-sm text-tallinn-gray_medium">Linnaosa</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="py-16 bg-tallinn-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="grid lg:grid-cols-2 gap-12">
+        <div>
+          <h2 class="text-3xl font-display font-bold text-tallinn-gray_dark mb-4">Võta ühendust</h2>
+          <p class="text-tallinn-gray_medium mb-8">Küsimuste korral või päringu esitamiseks võta meiega ühendust alloleval vormil või otse kontaktandmetel.</p>
+
+          <div class="space-y-4">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-tallinn-light rounded flex items-center justify-center flex-shrink-0">📍</div>
+              <div>
+                <h4 class="font-semibold text-tallinn-gray_dark">Aadress</h4>
+                <p class="text-tallinn-gray_medium">Vabaduse väljak 7, 15199 Tallinn</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-tallinn-light rounded flex items-center justify-center flex-shrink-0">✉️</div>
+              <div>
+                <h4 class="font-semibold text-tallinn-gray_dark">E-post</h4>
+                <p class="text-tallinn-gray_medium">aripinnad@tallinnlv.ee</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-tallinn-light rounded flex items-center justify-center flex-shrink-0">📞</div>
+              <div>
+                <h4 class="font-semibold text-tallinn-gray_dark">Telefon</h4>
+                <p class="text-tallinn-gray_medium">+372 640 4218</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-tallinn-light rounded flex items-center justify-center flex-shrink-0">🕘</div>
+              <div>
+                <h4 class="font-semibold text-tallinn-gray_dark">Lahtiolekuajad</h4>
+                <p class="text-tallinn-gray_medium">E–R 8:00–17:00</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-tallinn-gray_light rounded p-8">
+          <h3 class="font-semibold text-xl text-tallinn-gray_dark mb-6">Esita üüripäring</h3>
+
+          <form id="contact-form" onsubmit="submitContactForm(event)" class="space-y-4">
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label for="form-name" class="block text-sm font-semibold text-tallinn-gray_dark mb-1">Nimi *</label>
+                <input type="text" id="form-name" required
+                  class="w-full px-4 py-3 border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
+              </div>
+              <div>
+                <label for="form-company" class="block text-sm font-semibold text-tallinn-gray_dark mb-1">Ettevõte</label>
+                <input type="text" id="form-company"
+                  class="w-full px-4 py-3 border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label for="form-email" class="block text-sm font-semibold text-tallinn-gray_dark mb-1">E-post *</label>
+                <input type="email" id="form-email" required
+                  class="w-full px-4 py-3 border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
+              </div>
+              <div>
+                <label for="form-phone" class="block text-sm font-semibold text-tallinn-gray_dark mb-1">Telefon</label>
+                <input type="tel" id="form-phone"
+                  class="w-full px-4 py-3 border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
+              </div>
+            </div>
+
+            <div>
+              <label for="form-property" class="block text-sm font-semibold text-tallinn-gray_dark mb-1">Huvipinna ID / Link</label>
+              <input type="text" id="form-property" placeholder="nt TLN-0001"
+                class="w-full px-4 py-3 border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
+            </div>
+
+            <div>
+              <label for="form-message" class="block text-sm font-semibold text-tallinn-gray_dark mb-1">Sõnum *</label>
+              <textarea id="form-message" rows="4" required
+                class="w-full px-4 py-3 border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none resize-none bg-white"
+                placeholder="Kirjeldage oma huvi ja vajadusi..."></textarea>
+            </div>
+
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" id="form-gdpr" required class="mt-1 w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+              <span class="text-sm text-tallinn-gray_medium">
+                Nõustun, et minu andmeid töödeldakse päringu menetlemiseks vastavalt <a href="#" class="text-tallinn-primary hover:underline">privaatsustingimustele</a>. *
+              </span>
+            </label>
+
+            <button type="submit"
+              class="w-full bg-tallinn-primary hover:bg-tallinn-secondary text-white py-3 px-6 rounded font-semibold transition flex items-center justify-center gap-2">
+              Saada päring
+            </button>
+          </form>
+
+          <div id="form-success" class="hidden text-center py-8">
+            <div class="w-16 h-16 bg-tallinn-light rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-tallinn-primary text-3xl">✓</span>
+            </div>
+            <h4 class="text-xl font-semibold text-tallinn-gray_dark mb-2">Päring saadetud!</h4>
+            <p class="text-tallinn-gray_medium">Võtame teiega ühendust esimesel võimalusel.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="py-16 bg-tallinn-gray_light">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6">
+      <h2 class="text-3xl font-display font-bold text-tallinn-gray_dark text-center mb-12">Korduma kippuvad küsimused</h2>
+
+      <div class="space-y-4">
+        <div class="bg-tallinn-white rounded shadow-sm overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-tallinn-gray_light transition">
+            <span class="font-semibold text-tallinn-gray_dark">Kuidas toimub üürihinna kujunemine?</span>
+            <span class="text-tallinn-gray_medium">▾</span>
+          </button>
+          <div class="hidden px-6 pb-4 text-tallinn-gray_medium">
+            Üürihind kujuneb lähtuvalt pinna asukohast, seisukorrast ja turutingimustest.
+          </div>
+        </div>
+
+        <div class="bg-tallinn-white rounded shadow-sm overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-tallinn-gray_light transition">
+            <span class="font-semibold text-tallinn-gray_dark">Kui pikk on tüüpiline üürileping?</span>
+            <span class="text-tallinn-gray_medium">▾</span>
+          </button>
+          <div class="hidden px-6 pb-4 text-tallinn-gray_medium">
+            Äripindade üürilepingud sõlmitakse tavaliselt mitmeks aastaks, täpsed tingimused lepitakse kokku.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-tallinn-gray_dark text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-white/10 rounded flex items-center justify-center">🏛️</div>
+            <div>
+              <span class="font-bold text-lg">TALLINN</span>
+              <span class="text-xs text-gray-400 block -mt-1">Äripinnad</span>
+            </div>
+          </div>
+          <p class="text-gray-400 text-sm">Tallinna linna äripindade üürile andmise infoportaal.</p>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-4">Kiirlingid</h4>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li><a href="#listings" class="hover:text-white transition">Vabad pinnad</a></li>
+            <li><a href="#how-to" class="hover:text-white transition">Kuidas üürida</a></li>
+            <li><a href="#terms" class="hover:text-white transition">Tingimused</a></li>
+            <li><a href="#contact" class="hover:text-white transition">Kontakt</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-4">Kontakt</h4>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li>Vabaduse väljak 7</li>
+            <li>15199 Tallinn</li>
+            <li>aripinnad@tallinnlv.ee</li>
+            <li>+372 640 4218</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-4">Õiguslik info</h4>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li><a href="#" class="hover:text-white transition">Privaatsuspoliitika</a></li>
+            <li><a href="#" class="hover:text-white transition">Küpsiste kasutamine</a></li>
+            <li><a href="#" class="hover:text-white transition">Ligipääsetavus</a></li>
+            <li><a href="#" class="hover:text-white transition">Üldtingimused</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-500">
+        © 2025 Tallinna linn. Kõik õigused kaitstud.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Detail Modal -->
+  <div id="detail-modal" class="fixed inset-0 z-50 hidden">
+    <div class="modal-overlay absolute inset-0 bg-black/50" onclick="closeDetailModal()"></div>
+    <div class="absolute inset-4 lg:inset-8 bg-white rounded shadow-2xl overflow-hidden flex flex-col animate-fade-in">
+      <div class="flex items-center justify-between p-6 border-b border-tallinn-gray_border">
+        <h2 id="modal-title" class="text-xl font-semibold text-tallinn-gray_dark">Pinna detailid</h2>
+        <button onclick="closeDetailModal()" class="p-2 hover:bg-tallinn-gray_light rounded transition" aria-label="Sulge">
+          ✕
+        </button>
+      </div>
+      <div id="modal-content" class="flex-1 overflow-y-auto p-6 custom-scrollbar"></div>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div id="contact-modal" class="fixed inset-0 z-50 hidden">
+    <div class="modal-overlay absolute inset-0 bg-black/50" onclick="closeContactModal()"></div>
+    <div class="absolute inset-4 lg:inset-y-8 lg:inset-x-1/4 bg-white rounded shadow-2xl overflow-hidden flex flex-col animate-fade-in">
+      <div class="flex items-center justify-between p-6 border-b border-tallinn-gray_border">
+        <h2 class="text-xl font-semibold text-tallinn-gray_dark">Esita üüripäring</h2>
+        <button onclick="closeContactModal()" class="p-2 hover:bg-tallinn-gray_light rounded transition" aria-label="Sulge">
+          ✕
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-6 custom-scrollbar">
+        <form id="modal-contact-form" onsubmit="submitModalContactForm(event)" class="space-y-4">
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label for="modal-form-name" class="block text-sm font-semibold text-tallinn-gray_dark mb-1">Nimi *</label>
+              <input type="text" id="modal-form-name" required
+                class="w-full px-4 py-3 border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
+            </div>
+            <div>
+              <label for="modal-form-company" class="block text-sm font-semibold text-tallinn-gray_dark mb-1">Ettevõte</label>
+              <input type="text" id="modal-form-company"
+                class="w-full px-4 py-3 border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label for="modal-form-email" class="block text-sm font-semibold text-tallinn-gray_dark mb-1">E-post *</label>
+              <input type="email" id="modal-form-email" required
+                class="w-full px-4 py-3 border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
+            </div>
+            <div>
+              <label for="modal-form-phone" class="block text-sm font-semibold text-tallinn-gray_dark mb-1">Telefon</label>
+              <input type="tel" id="modal-form-phone"
+                class="w-full px-4 py-3 border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
+            </div>
+          </div>
+
+          <div>
+            <label for="modal-form-property" class="block text-sm font-semibold text-tallinn-gray_dark mb-1">Huvipinna ID / Link</label>
+            <input type="text" id="modal-form-property" placeholder="nt TLN-0001"
+              class="w-full px-4 py-3 border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
+          </div>
+
+          <div>
+            <label for="modal-form-message" class="block text-sm font-semibold text-tallinn-gray_dark mb-1">Sõnum *</label>
+            <textarea id="modal-form-message" rows="4" required
+              class="w-full px-4 py-3 border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none resize-none bg-white"
+              placeholder="Kirjeldage oma huvi ja vajadusi..."></textarea>
+          </div>
+
+          <label class="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" id="modal-form-gdpr" required class="mt-1 w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+            <span class="text-sm text-tallinn-gray_medium">
+              Nõustun, et minu andmeid töödeldakse päringu menetlemiseks vastavalt <a href="#" class="text-tallinn-primary hover:underline">privaatsustingimustele</a>. *
+            </span>
+          </label>
+
+          <button type="submit"
+            class="w-full bg-tallinn-primary hover:bg-tallinn-secondary text-white py-3 px-6 rounded font-semibold transition">
+            Saada päring
+          </button>
+        </form>
+
+        <div id="modal-form-success" class="hidden text-center py-8">
+          <div class="w-16 h-16 bg-tallinn-light rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-tallinn-primary text-3xl">✓</span>
+          </div>
+          <h4 class="text-xl font-semibold text-tallinn-gray_dark mb-2">Päring saadetud!</h4>
+          <p class="text-tallinn-gray_medium">Võtame teiega ühendust esimesel võimalusel.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample listings data
+    const listings = [
+      { id:'TLN-0001', address:'Pärnu mnt 67', district:'Kesklinn', area:120, pricePerSqm:12, priceMonth:1440, purpose:'teenindus', condition:'valmis', availability:'kohe', availableDate:null, floor:'1', separateEntrance:true, accessible:true, transport:true, yearBuilt:2015, description:'Heas asukohas avar äripind suure vitriinakna ja eraldi sissepääsuga.' },
+      { id:'TLN-0002', address:'Telliskivi 60a', district:'Põhja-Tallinn', area:85, pricePerSqm:15, priceMonth:1275, purpose:'büroo', condition:'valmis', availability:'kohe', availableDate:null, floor:'2', separateEntrance:false, accessible:false, transport:true, yearBuilt:1920, description:'Atmosfäärne büroopind Telliskivi loomelinnakus. Renoveeritud ruumid.' },
+      { id:'TLN-0003', address:'Viru tn 15', district:'Kesklinn', area:200, pricePerSqm:25, priceMonth:5000, purpose:'kaubandus', condition:'valmis', availability:'peagi', availableDate:'15.03.2025', floor:'1', separateEntrance:true, accessible:true, transport:true, yearBuilt:2008, description:'Premium asukoht Viru tänaval. Suurepärane nähtavus ja jalakäijate voog.' },
+      { id:'TLN-0004', address:'Mustamäe tee 55', district:'Mustamäe', area:450, pricePerSqm:5, priceMonth:2250, purpose:'ladu', condition:'remont', availability:'kohe', availableDate:null, floor:'1', separateEntrance:true, accessible:true, transport:false, yearBuilt:1975, description:'Suur laopind. Vajab renoveerimist. Võimalus kujundada vastavalt vajadustele.' },
+      { id:'TLN-0005', address:'Rataskaevu 16', district:'Kesklinn', area:95, pricePerSqm:null, priceMonth:null, purpose:'toitlustus', condition:'osaliselt', availability:'peagi', availableDate:'01.06.2025', floor:'1', separateEntrance:true, accessible:false, transport:true, yearBuilt:1880, description:'Vanalinna südames ajalooline pind. Sobib kohvikuks/restoraniks.' },
+      { id:'TLN-0006', address:'Sõpruse pst 201', district:'Lasnamäe', area:180, pricePerSqm:7, priceMonth:1260, purpose:'teenindus', condition:'remont', availability:'kohe', availableDate:null, floor:'1', separateEntrance:true, accessible:true, transport:true, yearBuilt:1985, description:'Suur äripind tihedas elupiirkonnas. Vajab renoveerimist.' },
+      { id:'TLN-0007', address:'Kopli 25', district:'Põhja-Tallinn', area:65, pricePerSqm:10, priceMonth:650, purpose:'büroo', condition:'valmis', availability:'peagi', availableDate:'01.04.2025', floor:'3', separateEntrance:false, accessible:false, transport:true, yearBuilt:2020, description:'Kompaktne ja kaasaegne büroopind. Ideaalne väikeettevõttele.' },
+      { id:'TLN-0008', address:'Kristiine 1', district:'Kristiine', area:320, pricePerSqm:9, priceMonth:2880, purpose:'kaubandus', condition:'valmis', availability:'kohe', availableDate:null, floor:'1', separateEntrance:true, accessible:true, transport:true, yearBuilt:2005, description:'Suur kaubanduspind. Hea ligipääsetavus ja nähtavus magistraali ääres.' }
+    ];
+
+    let filteredListings = [...listings];
+    let activeQuickFilters = new Set();
+    let currentView = 'list';
+
+    function euro(v){ return (v === null || v === undefined) ? 'Küsi hinda' : `${v} €`; }
+
+    function renderListings() {
+      const grid = document.getElementById('listings-grid');
+      const countEl = document.getElementById('results-count');
+
+      countEl.textContent = `${filteredListings.length} kuulutust leitud`;
+
+      grid.innerHTML = filteredListings.map(listing => `
+        <article class="listing-card bg-tallinn-white rounded shadow-sm border border-tallinn-gray_border overflow-hidden flex flex-col sm:flex-row">
+          <div class="sm:w-72 h-48 sm:h-auto flex-shrink-0 bg-gradient-to-br from-tallinn-light to-tallinn-gray_light relative">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="text-center p-4">
+                <div class="text-tallinn-primary/40 text-4xl mb-2">🏢</div>
+                <span class="text-sm text-tallinn-gray_medium">Pilt puudub</span>
+              </div>
+            </div>
+
+            <div class="absolute top-3 left-3 flex flex-col gap-2">
+              ${
+                listing.availability === 'kohe'
+                  ? '<span class="status-badge bg-tallinn-primary text-white rounded-full font-semibold">Kohe vaba</span>'
+                  : `<span class="status-badge bg-tallinn-secondary text-white rounded-full font-semibold">Vabaneb ${listing.availableDate}</span>`
+              }
+              ${listing.condition === 'remont' ? '<span class="status-badge bg-orange-600 text-white rounded-full font-semibold">Remonti vajab</span>' : ''}
+              ${listing.condition === 'osaliselt' ? '<span class="status-badge bg-blue-600 text-white rounded-full font-semibold">Osaliselt renoveeritud</span>' : ''}
+            </div>
+          </div>
+
+          <div class="flex-1 p-5 flex flex-col">
+            <div class="flex items-start justify-between gap-4 mb-3">
+              <div>
+                <span class="text-xs font-semibold text-tallinn-primary uppercase tracking-wide">${listing.id}</span>
+                <h3 class="font-semibold text-lg text-tallinn-gray_dark mt-1">${listing.address}</h3>
+                <p class="text-sm text-tallinn-gray_medium">${listing.district}</p>
+              </div>
+              <span class="px-3 py-1 bg-tallinn-light text-tallinn-primary text-xs font-semibold rounded capitalize">${listing.purpose}</span>
+            </div>
+
+            <p class="text-tallinn-gray_medium text-sm mb-4">${listing.description}</p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+              <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
+                <span class="block text-xs text-tallinn-gray_medium">Pindala</span>
+                <span class="font-semibold text-tallinn-gray_dark">${listing.area} m²</span>
+              </div>
+              <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
+                <span class="block text-xs text-tallinn-gray_medium">Korrus</span>
+                <span class="font-semibold text-tallinn-gray_dark">${listing.floor}. korrus</span>
+              </div>
+              <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
+                <span class="block text-xs text-tallinn-gray_medium">€/m²</span>
+                <span class="font-semibold text-tallinn-gray_dark">${listing.pricePerSqm ? euro(listing.pricePerSqm) : 'Küsi hinda'}</span>
+              </div>
+              <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
+                <span class="block text-xs text-tallinn-gray_medium">€/kuu</span>
+                <span class="font-semibold text-tallinn-gray_dark">${listing.priceMonth ? euro(listing.priceMonth) : 'Küsi hinda'}</span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-4">
+              ${listing.separateEntrance ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Eraldi sissepääs</span>' : ''}
+              ${listing.accessible ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ligipääsetav</span>' : ''}
+              ${listing.transport ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ühistransport lähedal</span>' : ''}
+              <span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ehitusaasta: ${listing.yearBuilt}</span>
+            </div>
+
+            <div class="flex gap-3 mt-auto">
+              <button onclick="openDetailModal('${listing.id}')"
+                class="flex-1 px-4 py-2.5 border-2 border-tallinn-primary text-tallinn-primary hover:bg-tallinn-primary hover:text-white rounded font-semibold text-sm transition">
+                Vaata detaile
+              </button>
+              <button onclick="openContactModalWithProperty('${listing.id}')"
+                class="flex-1 px-4 py-2.5 bg-tallinn-primary hover:bg-tallinn-secondary text-white rounded font-semibold text-sm transition">
+                Esita päring
+              </button>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function toggleQuickFilter(filter) {
+      const btn = document.querySelector(`[data-filter="${filter}"]`);
+      if (activeQuickFilters.has(filter)) {
+        activeQuickFilters.delete(filter);
+        btn.classList.remove('bg-white','text-tallinn-primary');
+        btn.classList.add('bg-white/20','text-white');
+      } else {
+        activeQuickFilters.add(filter);
+        btn.classList.remove('bg-white/20','text-white');
+        btn.classList.add('bg-white','text-tallinn-primary');
+      }
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const searchTerm = (document.getElementById('search-input').value || '').toLowerCase();
+      const areaMin = parseInt(document.getElementById('area-min').value) || 0;
+      const areaMax = parseInt(document.getElementById('area-max').value) || Infinity;
+      const priceMin = parseInt(document.getElementById('price-min').value) || 0;
+      const priceMax = parseInt(document.getElementById('price-max').value) || Infinity;
+
+      const selectedDistricts = [...document.querySelectorAll('.filter-district:checked')].map(el => el.value);
+      const selectedPurposes = [...document.querySelectorAll('.filter-purpose:checked')].map(el => el.value);
+      const selectedConditions = [...document.querySelectorAll('.filter-condition:checked')].map(el => el.value);
+      const selectedAvailability = [...document.querySelectorAll('.filter-availability:checked')].map(el => el.value);
+
+      const floor = document.getElementById('filter-floor').value;
+      const separateEntrance = document.getElementById('filter-separate-entrance').checked;
+      const accessible = document.getElementById('filter-accessible').checked;
+      const transport = document.getElementById('filter-transport').checked;
+      const yearBuilt = document.getElementById('filter-year').value;
+
+      filteredListings = listings.filter(listing => {
+        if (searchTerm &&
+          !listing.address.toLowerCase().includes(searchTerm) &&
+          !listing.district.toLowerCase().includes(searchTerm) &&
+          !listing.description.toLowerCase().includes(searchTerm)
+        ) return false;
+
+        if (activeQuickFilters.has('available') && listing.availability !== 'kohe') return false;
+        if (activeQuickFilters.has('upcoming') && listing.availability !== 'peagi') return false;
+        if (activeQuickFilters.has('teenindus') && listing.purpose !== 'teenindus') return false;
+        if (activeQuickFilters.has('büroo') && listing.purpose !== 'büroo') return false;
+        if (activeQuickFilters.has('ladu') && listing.purpose !== 'ladu') return false;
+        if (activeQuickFilters.has('toitlustus') && listing.purpose !== 'toitlustus') return false;
+
+        if (listing.area < areaMin || listing.area > areaMax) return false;
+
+        if (listing.pricePerSqm !== null && listing.pricePerSqm !== undefined) {
+          if (listing.pricePerSqm < priceMin || listing.pricePerSqm > priceMax) return false;
+        }
+
+        if (selectedDistricts.length > 0 && !selectedDistricts.some(d => listing.district.toLowerCase().includes(d))) return false;
+        if (selectedPurposes.length > 0 && !selectedPurposes.includes(listing.purpose)) return false;
+        if (selectedConditions.length > 0 && !selectedConditions.includes(listing.condition)) return false;
+        if (selectedAvailability.length > 0 && !selectedAvailability.includes(listing.availability)) return false;
+
+        if (floor) {
+          if (floor === '3+' && parseInt(listing.floor) < 3) return false;
+          if (floor !== '3+' && listing.floor !== floor) return false;
+        }
+
+        if (separateEntrance && !listing.separateEntrance) return false;
+        if (accessible && !listing.accessible) return false;
+        if (transport && !listing.transport) return false;
+
+        if (yearBuilt) {
+          const y = listing.yearBuilt;
+          if (yearBuilt === 'enne1940' && y >= 1940) return false;
+          if (yearBuilt === '1940-1990' && (y < 1940 || y > 1990)) return false;
+          if (yearBuilt === '1991-2010' && (y < 1991 || y > 2010)) return false;
+          if (yearBuilt === '2011+' && y < 2011) return false;
+        }
+
+        return true;
+      });
+
+      sortListings(true);
+      renderListings();
+    }
+
+    function applySearch() { applyFilters(); }
+
+    function clearAllFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('area-min').value = '';
+      document.getElementById('area-max').value = '';
+      document.getElementById('price-min').value = '';
+      document.getElementById('price-max').value = '';
+      document.getElementById('filter-floor').value = '';
+      document.getElementById('filter-year').value = '';
+      document.getElementById('filter-separate-entrance').checked = false;
+      document.getElementById('filter-accessible').checked = false;
+      document.getElementById('filter-transport').checked = false;
+
+      document.querySelectorAll('.filter-district, .filter-purpose, .filter-condition, .filter-availability').forEach(el => el.checked = false);
+
+      activeQuickFilters.clear();
+      document.querySelectorAll('.filter-chip').forEach(btn => {
+        btn.classList.remove('bg-white','text-tallinn-primary');
+        btn.classList.add('bg-white/20','text-white');
+      });
+
+      filteredListings = [...listings];
+      sortListings(true);
+      renderListings();
+    }
+
+    function sortListings(silent=false) {
+      const sortBy = document.getElementById('sort-select').value;
+      filteredListings.sort((a,b) => {
+        switch(sortBy) {
+          case 'price-asc':  return (a.pricePerSqm ?? Infinity) - (b.pricePerSqm ?? Infinity);
+          case 'price-desc': return (b.pricePerSqm ?? -Infinity) - (a.pricePerSqm ?? -Infinity);
+          case 'area-asc':   return a.area - b.area;
+          case 'area-desc':  return b.area - a.area;
+          case 'available':  return (a.availability === 'kohe' ? 0 : 1) - (b.availability === 'kohe' ? 0 : 1);
+          default: return 0;
+        }
+      });
+      if (!silent) renderListings();
+    }
+
+    function setView(view) {
+      currentView = view;
+      const listingsGrid = document.getElementById('listings-grid');
+      const mapView = document.getElementById('map-view');
+      const listBtn = document.getElementById('view-list');
+      const mapBtn = document.getElementById('view-map');
+
+      if (view === 'list') {
+        listingsGrid.classList.remove('hidden');
+        mapView.classList.add('hidden');
+        listBtn.classList.add('bg-white','shadow','text-tallinn-primary');
+        mapBtn.classList.remove('bg-white','shadow','text-tallinn-primary');
+        mapBtn.classList.add('text-tallinn-gray_medium');
+      } else {
+        listingsGrid.classList.add('hidden');
+        mapView.classList.remove('hidden');
+        mapBtn.classList.add('bg-white','shadow','text-tallinn-primary');
+        mapBtn.classList.remove('text-tallinn-gray_medium');
+        listBtn.classList.remove('bg-white','shadow','text-tallinn-primary');
+        listBtn.classList.add('text-tallinn-gray_medium');
+      }
+    }
+
+    function openDetailModal(id) {
+      const listing = listings.find(l => l.id === id);
+      if (!listing) return;
+      document.getElementById('modal-title').textContent = `${listing.address} (${listing.id})`;
+      document.getElementById('modal-content').innerHTML = `
+        <div class="space-y-4">
+          <p class="text-tallinn-gray_medium">${listing.description}</p>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div class="bg-tallinn-gray_light rounded p-3"><div class="text-xs text-tallinn-gray_medium">Linnaosa</div><div class="font-semibold">${listing.district}</div></div>
+            <div class="bg-tallinn-gray_light rounded p-3"><div class="text-xs text-tallinn-gray_medium">Pindala</div><div class="font-semibold">${listing.area} m²</div></div>
+            <div class="bg-tallinn-gray_light rounded p-3"><div class="text-xs text-tallinn-gray_medium">Ehitusaasta</div><div class="font-semibold">${listing.yearBuilt}</div></div>
+            <div class="bg-tallinn-gray_light rounded p-3"><div class="text-xs text-tallinn-gray_medium">Saadavus</div><div class="font-semibold">${listing.availability === 'kohe' ? 'Kohe vaba' : 'Vabaneb: ' + listing.availableDate}</div></div>
+          </div>
+          <button onclick="openContactModalWithProperty('${listing.id}')" class="w-full bg-tallinn-primary hover:bg-tallinn-secondary text-white py-3 px-6 rounded font-semibold transition">
+            Esita üüripäring
+          </button>
+        </div>
+      `;
+      document.getElementById('detail-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detail-modal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function openContactModal() {
+      document.getElementById('contact-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function openContactModalWithProperty(id) {
+      openContactModal();
+      const el = document.getElementById('modal-form-property');
+      if (el) el.value = id;
+    }
+
+    function closeContactModal() {
+      document.getElementById('contact-modal').classList.add('hidden');
+      document.body.style.overflow = '';
+      // reset modal success if needed
+      document.getElementById('modal-contact-form').classList.remove('hidden');
+      document.getElementById('modal-form-success').classList.add('hidden');
+    }
+
+    function submitContactForm(e) {
+      e.preventDefault();
+      document.getElementById('contact-form').classList.add('hidden');
+      document.getElementById('form-success').classList.remove('hidden');
+    }
+
+    function submitModalContactForm(e) {
+      e.preventDefault();
+      document.getElementById('modal-contact-form').classList.add('hidden');
+      document.getElementById('modal-form-success').classList.remove('hidden');
+    }
+
+    function toggleMobileMenu() {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    }
+
+    function toggleFaq(btn) {
+      const content = btn.nextElementSibling;
+      content.classList.toggle('hidden');
+    }
+
+    // init
+    renderListings();
+  </script>
+</body>
+</html>
