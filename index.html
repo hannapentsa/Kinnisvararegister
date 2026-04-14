@@ -70,6 +70,45 @@
     .animate-fade-in { animation: fadeIn 0.25s ease forwards; }
 
     .status-badge { font-size: 0.72rem; padding: 0.25rem 0.55rem; }
+
+    .map-marker {
+      transform: translate(-50%, -100%);
+      transition: transform 0.2s ease;
+    }
+    .map-marker:hover {
+      transform: translate(-50%, -104%);
+    }
+
+    .map-pin {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px 999px 999px 0;
+      transform: rotate(-45deg);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+      position: relative;
+      border: 3px solid #fff;
+    }
+    .map-pin::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: #fff;
+      border-radius: 999px;
+      position: absolute;
+      top: 4px;
+      left: 4px;
+    }
+
+    .map-tooltip {
+      opacity: 0;
+      transform: translateY(6px);
+      transition: all 0.2s ease;
+      pointer-events: none;
+    }
+    .group:hover .map-tooltip {
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 </head>
 
@@ -210,7 +249,6 @@
             <button onclick="clearAllFilters()" class="text-sm text-tallinn-primary hover:underline">Tühjenda</button>
           </div>
 
-          <!-- District -->
           <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
             <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Linnaosa</h3>
             <div class="space-y-2">
@@ -242,7 +280,6 @@
             </div>
           </div>
 
-          <!-- Area -->
           <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
             <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Pindala (m²)</h3>
             <div class="space-y-3">
@@ -259,7 +296,6 @@
             </div>
           </div>
 
-          <!-- Price month -->
           <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
             <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Kuuhind (€)</h3>
             <div class="flex items-center gap-3">
@@ -273,7 +309,6 @@
             </div>
           </div>
 
-          <!-- Price sqm -->
           <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
             <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Hind (€/m²)</h3>
             <div class="flex items-center gap-3">
@@ -287,7 +322,6 @@
             </div>
           </div>
 
-          <!-- VAT -->
           <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
             <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">KM</h3>
             <select id="filter-vat" onchange="applyFilters()"
@@ -298,7 +332,6 @@
             </select>
           </div>
 
-          <!-- Purpose -->
           <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
             <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Otstarve</h3>
             <div class="space-y-2">
@@ -330,7 +363,6 @@
             </div>
           </div>
 
-          <!-- Condition -->
           <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
             <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Seisukord</h3>
             <div class="space-y-2">
@@ -352,7 +384,6 @@
             </div>
           </div>
 
-          <!-- Availability -->
           <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
             <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Saadavus</h3>
             <div class="space-y-2">
@@ -369,7 +400,6 @@
             </div>
           </div>
 
-          <!-- Floor + features -->
           <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
             <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Korrus</h3>
             <select id="filter-floor" onchange="applyFilters()"
@@ -395,7 +425,6 @@
             </div>
           </div>
 
-          <!-- Technical -->
           <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
             <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Mugavused ja tehniline info</h3>
             <div class="space-y-2">
@@ -432,7 +461,6 @@
             </div>
           </div>
 
-          <!-- Transport -->
           <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
             <label class="flex items-center gap-2 cursor-pointer group">
               <input type="checkbox" id="filter-transport" onchange="applyFilters()"
@@ -441,7 +469,6 @@
             </label>
           </div>
 
-          <!-- Year -->
           <div>
             <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Ehitusaasta</h3>
             <select id="filter-year" onchange="applyFilters()"
@@ -498,16 +525,56 @@
 
         <!-- Map View -->
         <div id="map-view" class="hidden mb-6">
-          <div class="bg-gradient-to-br from-tallinn-light to-tallinn-gray_light rounded h-96 flex items-center justify-center relative overflow-hidden">
-            <div class="relative text-center p-6 bg-white/90 backdrop-blur rounded shadow-lg">
-              <svg class="w-12 h-12 text-tallinn-primary mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <p class="text-tallinn-primary font-semibold">Tallinna äripindade kaart</p>
-              <p class="text-sm text-tallinn-gray_medium mt-1">Kaardi integreerimine (placeholder)</p>
+          <div class="bg-tallinn-white rounded shadow-sm border border-tallinn-gray_border overflow-hidden">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4 border-b border-tallinn-gray_border">
+              <div>
+                <h3 class="font-semibold text-lg text-tallinn-gray_dark">Kaardivaade</h3>
+                <p id="map-summary" class="text-sm text-tallinn-gray_medium">Vaates on 0 pinna markerit</p>
+              </div>
+              <div class="flex flex-wrap gap-2 text-xs">
+                <span class="px-3 py-1 rounded-full bg-[#E7F0FF] text-[#195AA8] font-semibold">Büroo</span>
+                <span class="px-3 py-1 rounded-full bg-[#E8FFF3] text-[#117A50] font-semibold">Teenindus</span>
+                <span class="px-3 py-1 rounded-full bg-[#FFF1E7] text-[#AF5B14] font-semibold">Kaubandus / toitlustus</span>
+                <span class="px-3 py-1 rounded-full bg-[#F1EFFF] text-[#6153C4] font-semibold">Ladu</span>
+              </div>
+            </div>
+
+            <div class="relative h-[520px] overflow-hidden bg-[#F6FAFE]">
+              <div class="absolute inset-0" style="background-image:
+                linear-gradient(to right, rgba(0,114,206,0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,114,206,0.06) 1px, transparent 1px);
+                background-size: 44px 44px;">
+              </div>
+
+              <div class="absolute inset-0 opacity-90">
+                <div class="absolute left-[8%] top-[13%] w-[22%] h-[22%] rounded-3xl bg-[#dff0ff] border border-white/80 shadow-sm"></div>
+                <div class="absolute left-[30%] top-[10%] w-[24%] h-[24%] rounded-3xl bg-[#ebf7ff] border border-white/80 shadow-sm"></div>
+                <div class="absolute left-[56%] top-[12%] w-[28%] h-[26%] rounded-3xl bg-[#e6f6ff] border border-white/80 shadow-sm"></div>
+                <div class="absolute left-[12%] top-[42%] w-[25%] h-[24%] rounded-3xl bg-[#edf9ff] border border-white/80 shadow-sm"></div>
+                <div class="absolute left-[40%] top-[38%] w-[22%] h-[22%] rounded-3xl bg-[#eaf3ff] border border-white/80 shadow-sm"></div>
+                <div class="absolute left-[65%] top-[44%] w-[20%] h-[20%] rounded-3xl bg-[#e5fbff] border border-white/80 shadow-sm"></div>
+                <div class="absolute left-[38%] top-[67%] w-[26%] h-[18%] rounded-3xl bg-[#e8f4ff] border border-white/80 shadow-sm"></div>
+              </div>
+
+              <div class="absolute inset-0 pointer-events-none">
+                <div class="absolute left-[11%] top-[18%] text-sm font-semibold text-[#6A7F91]">Põhja-Tallinn</div>
+                <div class="absolute left-[40%] top-[20%] text-sm font-semibold text-[#6A7F91]">Kesklinn</div>
+                <div class="absolute left-[67%] top-[22%] text-sm font-semibold text-[#6A7F91]">Lasnamäe</div>
+                <div class="absolute left-[18%] top-[50%] text-sm font-semibold text-[#6A7F91]">Kristiine</div>
+                <div class="absolute left-[46%] top-[48%] text-sm font-semibold text-[#6A7F91]">Mustamäe</div>
+              </div>
+
+              <div class="absolute left-[18%] top-[58%] w-[32%] h-[4px] bg-white/90 rounded-full shadow-sm"></div>
+              <div class="absolute left-[34%] top-[28%] w-[40%] h-[4px] bg-white/90 rounded-full shadow-sm rotate-[8deg]"></div>
+              <div class="absolute left-[48%] top-[52%] w-[22%] h-[4px] bg-white/90 rounded-full shadow-sm -rotate-[18deg]"></div>
+              <div class="absolute left-[56%] top-[34%] w-[26%] h-[4px] bg-white/90 rounded-full shadow-sm rotate-[24deg]"></div>
+
+              <div id="map-markers" class="absolute inset-0 z-10"></div>
+
+              <div class="absolute bottom-4 left-4 bg-white/95 backdrop-blur rounded-xl shadow-lg border border-white px-4 py-3 max-w-sm">
+                <div class="text-sm font-semibold text-tallinn-gray_dark mb-1">Mock-up kaart</div>
+                <div class="text-xs text-tallinn-gray_medium">Markerid on demo jaoks paigutatud illustratiivselt. Klõps markeril avab pinna detailid.</div>
+              </div>
             </div>
           </div>
         </div>
@@ -915,6 +982,8 @@
         kitchenette:true,
         wc:true,
         yearBuilt:2015,
+        mapX:46,
+        mapY:31,
         description:'Heas asukohas avar äripind suure vitriinakna ja eraldi sissepääsuga.'
       },
       {
@@ -942,6 +1011,8 @@
         kitchenette:true,
         wc:true,
         yearBuilt:1920,
+        mapX:27,
+        mapY:24,
         description:'Atmosfäärne büroopind Telliskivi loomelinnakus. Renoveeritud ruumid.'
       },
       {
@@ -969,6 +1040,8 @@
         kitchenette:false,
         wc:true,
         yearBuilt:2008,
+        mapX:49,
+        mapY:28,
         description:'Premium asukoht Viru tänaval. Suurepärane nähtavus ja jalakäijate voog.'
       },
       {
@@ -996,6 +1069,8 @@
         kitchenette:false,
         wc:true,
         yearBuilt:1975,
+        mapX:48,
+        mapY:52,
         description:'Suur laopind. Vajab renoveerimist. Võimalus kujundada vastavalt vajadustele.'
       },
       {
@@ -1023,6 +1098,8 @@
         kitchenette:true,
         wc:true,
         yearBuilt:1880,
+        mapX:43,
+        mapY:25,
         description:'Vanalinna südames ajalooline pind. Sobib kohvikuks/restoraniks.'
       },
       {
@@ -1050,6 +1127,8 @@
         kitchenette:false,
         wc:true,
         yearBuilt:1985,
+        mapX:71,
+        mapY:34,
         description:'Suur äripind tihedas elupiirkonnas. Vajab renoveerimist.'
       },
       {
@@ -1077,6 +1156,8 @@
         kitchenette:true,
         wc:true,
         yearBuilt:2020,
+        mapX:20,
+        mapY:19,
         description:'Kompaktne ja kaasaegne büroopind. Ideaalne väikeettevõttele.'
       },
       {
@@ -1104,6 +1185,8 @@
         kitchenette:true,
         wc:true,
         yearBuilt:2005,
+        mapX:30,
+        mapY:50,
         description:'Suur kaubanduspind. Hea ligipääsetavus ja nähtavus magistraali ääres.'
       }
     ];
@@ -1133,6 +1216,148 @@
       return `${floor}. korrus`;
     }
 
+    function getPurposeMeta(purpose) {
+      const map = {
+        büroo: {
+          label: 'Büroo',
+          pin: '#2C6BDE',
+          bg1: '#D9E9FF',
+          bg2: '#86B7FF',
+          card: '#E7F0FF',
+          text: '#195AA8'
+        },
+        teenindus: {
+          label: 'Teenindus',
+          pin: '#1F9D6A',
+          bg1: '#DDF8EA',
+          bg2: '#77D4A8',
+          card: '#E8FFF3',
+          text: '#117A50'
+        },
+        kaubandus: {
+          label: 'Kaubandus',
+          pin: '#E17C28',
+          bg1: '#FFE8D9',
+          bg2: '#FFB37E',
+          card: '#FFF1E7',
+          text: '#AF5B14'
+        },
+        toitlustus: {
+          label: 'Toitlustus',
+          pin: '#E17C28',
+          bg1: '#FFE8D9',
+          bg2: '#FFB37E',
+          card: '#FFF1E7',
+          text: '#AF5B14'
+        },
+        ladu: {
+          label: 'Ladu',
+          pin: '#7A6BEA',
+          bg1: '#ECE8FF',
+          bg2: '#B1A6FF',
+          card: '#F1EFFF',
+          text: '#6153C4'
+        }
+      };
+      return map[purpose] || {
+        label: purpose,
+        pin: '#0072CE',
+        bg1: '#E6F0F8',
+        bg2: '#9FCBF1',
+        card: '#E6F0F8',
+        text: '#005BA3'
+      };
+    }
+
+    function getListingImage(listing) {
+      const meta = getPurposeMeta(listing.purpose);
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="${meta.bg1}" />
+              <stop offset="100%" stop-color="${meta.bg2}" />
+            </linearGradient>
+            <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+              <stop offset="100%" stop-color="#dbeafe" stop-opacity="0.65"/>
+            </linearGradient>
+          </defs>
+
+          <rect width="960" height="640" fill="url(#sky)"/>
+          <rect y="465" width="960" height="175" fill="#edf2f7"/>
+          <rect y="500" width="960" height="140" fill="#dfe7ef"/>
+          <rect y="520" width="960" height="8" fill="#c3cfdb"/>
+
+          <rect x="95" y="210" width="480" height="260" rx="16" fill="#fdfefe"/>
+          <rect x="122" y="236" width="425" height="132" rx="12" fill="url(#glass)"/>
+          <rect x="122" y="384" width="200" height="58" rx="12" fill="#f3f6fa"/>
+          <rect x="345" y="384" width="202" height="58" rx="12" fill="#f3f6fa"/>
+
+          <rect x="610" y="165" width="180" height="305" rx="16" fill="#ffffff" opacity="0.93"/>
+          <rect x="632" y="188" width="136" height="100" rx="12" fill="url(#glass)"/>
+          <rect x="632" y="303" width="136" height="100" rx="12" fill="url(#glass)"/>
+
+          <rect x="120" y="230" width="430" height="10" fill="#d7e3ee" opacity="0.45"/>
+          <rect x="120" y="265" width="430" height="10" fill="#d7e3ee" opacity="0.45"/>
+          <rect x="120" y="300" width="430" height="10" fill="#d7e3ee" opacity="0.45"/>
+
+          <rect x="85" y="40" width="210" height="52" rx="26" fill="${meta.pin}" opacity="0.96"/>
+          <text x="190" y="73" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#ffffff">${meta.label}</text>
+
+          <rect x="52" y="535" width="856" height="72" rx="22" fill="#ffffff" opacity="0.9"/>
+          <text x="82" y="575" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#223045">${listing.address}</text>
+          <text x="82" y="604" font-family="Arial, sans-serif" font-size="22" font-weight="600" fill="#5f6f82">${listing.district} • ${listing.area} m²</text>
+
+          <circle cx="830" cy="98" r="44" fill="#ffffff" opacity="0.38"/>
+          <circle cx="870" cy="82" r="28" fill="#ffffff" opacity="0.42"/>
+        </svg>
+      `;
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    }
+
+    function renderMap() {
+      const markersEl = document.getElementById('map-markers');
+      const summaryEl = document.getElementById('map-summary');
+
+      if (!markersEl || !summaryEl) return;
+
+      summaryEl.textContent = `Vaates on ${filteredListings.length} pinna markerit`;
+
+      if (filteredListings.length === 0) {
+        markersEl.innerHTML = `
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="bg-white/95 backdrop-blur rounded-2xl shadow-lg border border-white px-6 py-5 text-center">
+              <div class="text-4xl mb-2">🗺️</div>
+              <div class="font-semibold text-tallinn-gray_dark mb-1">Kaardil pole tulemusi</div>
+              <div class="text-sm text-tallinn-gray_medium">Muuda filtreid, et markerid uuesti nähtavale tuua.</div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      markersEl.innerHTML = filteredListings.map(listing => {
+        const meta = getPurposeMeta(listing.purpose);
+        return `
+          <button
+            type="button"
+            class="group map-marker absolute"
+            style="left:${listing.mapX}%; top:${listing.mapY}%"
+            onclick="openDetailModal('${listing.id}')"
+            aria-label="Ava ${listing.address} detailid">
+            <div class="map-tooltip absolute bottom-[34px] left-1/2 -translate-x-1/2 mb-2 w-52 rounded-xl bg-white shadow-xl border border-slate-200 p-3 text-left">
+              <div class="text-xs font-semibold uppercase tracking-wide" style="color:${meta.text}">${listing.id}</div>
+              <div class="font-semibold text-tallinn-gray_dark">${listing.address}</div>
+              <div class="text-xs text-tallinn-gray_medium">${listing.district} • ${listing.area} m²</div>
+              <div class="text-xs text-tallinn-gray_medium mt-1">${listing.priceMonth ? `${listing.priceMonth} €/kuu` : 'Küsi hinda'}</div>
+            </div>
+            <div class="map-pin" style="background:${meta.pin}"></div>
+          </button>
+        `;
+      }).join('');
+    }
+
     function renderListings() {
       const grid = document.getElementById('listings-grid');
       const countEl = document.getElementById('results-count');
@@ -1147,98 +1372,100 @@
             <p class="text-tallinn-gray_medium">Muuda filtreid või tühjenda need, et näha rohkem tulemusi.</p>
           </div>
         `;
+        renderMap();
         return;
       }
 
-      grid.innerHTML = filteredListings.map(listing => `
-        <article class="listing-card bg-tallinn-white rounded shadow-sm border border-tallinn-gray_border overflow-hidden flex flex-col sm:flex-row">
-          <div class="sm:w-72 h-48 sm:h-auto flex-shrink-0 bg-gradient-to-br from-tallinn-light to-tallinn-gray_light relative">
-            <div class="absolute inset-0 flex items-center justify-center">
-              <div class="text-center p-4">
-                <div class="text-tallinn-primary/40 text-4xl mb-2">🏢</div>
-                <span class="text-sm text-tallinn-gray_medium">Pilt puudub</span>
+      grid.innerHTML = filteredListings.map(listing => {
+        const imageUrl = getListingImage(listing);
+        return `
+          <article class="listing-card bg-tallinn-white rounded shadow-sm border border-tallinn-gray_border overflow-hidden flex flex-col sm:flex-row">
+            <div class="sm:w-72 h-56 sm:h-auto flex-shrink-0 relative overflow-hidden bg-slate-100">
+              <img src="${imageUrl}" alt="${listing.address}" class="w-full h-full object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent"></div>
+
+              <div class="absolute top-3 left-3 flex flex-col gap-2">
+                ${
+                  listing.availability === 'kohe'
+                    ? '<span class="status-badge bg-tallinn-primary text-white rounded-full font-semibold">Kohe vaba</span>'
+                    : `<span class="status-badge bg-tallinn-secondary text-white rounded-full font-semibold">Vabaneb ${formatDate(listing.availableDate)}</span>`
+                }
+                ${listing.condition === 'remont' ? '<span class="status-badge bg-orange-600 text-white rounded-full font-semibold">Remonti vajab</span>' : ''}
+                ${listing.condition === 'osaliselt' ? '<span class="status-badge bg-blue-600 text-white rounded-full font-semibold">Osaliselt renoveeritud</span>' : ''}
               </div>
             </div>
 
-            <div class="absolute top-3 left-3 flex flex-col gap-2">
-              ${
-                listing.availability === 'kohe'
-                  ? '<span class="status-badge bg-tallinn-primary text-white rounded-full font-semibold">Kohe vaba</span>'
-                  : `<span class="status-badge bg-tallinn-secondary text-white rounded-full font-semibold">Vabaneb ${formatDate(listing.availableDate)}</span>`
-              }
-              ${listing.condition === 'remont' ? '<span class="status-badge bg-orange-600 text-white rounded-full font-semibold">Remonti vajab</span>' : ''}
-              ${listing.condition === 'osaliselt' ? '<span class="status-badge bg-blue-600 text-white rounded-full font-semibold">Osaliselt renoveeritud</span>' : ''}
-            </div>
-          </div>
+            <div class="flex-1 p-5 flex flex-col">
+              <div class="flex items-start justify-between gap-4 mb-3">
+                <div>
+                  <span class="text-xs font-semibold text-tallinn-primary uppercase tracking-wide">${listing.id}</span>
+                  <h3 class="font-semibold text-lg text-tallinn-gray_dark mt-1">${listing.address}</h3>
+                  <p class="text-sm text-tallinn-gray_medium">${listing.district}</p>
+                </div>
+                <span class="px-3 py-1 bg-tallinn-light text-tallinn-primary text-xs font-semibold rounded capitalize">${listing.purpose}</span>
+              </div>
 
-          <div class="flex-1 p-5 flex flex-col">
-            <div class="flex items-start justify-between gap-4 mb-3">
-              <div>
-                <span class="text-xs font-semibold text-tallinn-primary uppercase tracking-wide">${listing.id}</span>
-                <h3 class="font-semibold text-lg text-tallinn-gray_dark mt-1">${listing.address}</h3>
-                <p class="text-sm text-tallinn-gray_medium">${listing.district}</p>
-              </div>
-              <span class="px-3 py-1 bg-tallinn-light text-tallinn-primary text-xs font-semibold rounded capitalize">${listing.purpose}</span>
-            </div>
+              <p class="text-tallinn-gray_medium text-sm mb-4">${listing.description}</p>
 
-            <p class="text-tallinn-gray_medium text-sm mb-4">${listing.description}</p>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
+                  <span class="block text-xs text-tallinn-gray_medium">Pindala</span>
+                  <span class="font-semibold text-tallinn-gray_dark">${listing.area} m²</span>
+                </div>
+                <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
+                  <span class="block text-xs text-tallinn-gray_medium">Korrus</span>
+                  <span class="font-semibold text-tallinn-gray_dark">${floorLabel(listing.floor)}</span>
+                </div>
+                <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
+                  <span class="block text-xs text-tallinn-gray_medium">€/m²</span>
+                  <span class="font-semibold text-tallinn-gray_dark">${listing.pricePerSqm !== null ? `${listing.pricePerSqm} €` : 'Küsi hinda'}</span>
+                </div>
+                <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
+                  <span class="block text-xs text-tallinn-gray_medium">€/kuu</span>
+                  <span class="font-semibold text-tallinn-gray_dark">${euro(listing.priceMonth)}</span>
+                </div>
+              </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-              <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
-                <span class="block text-xs text-tallinn-gray_medium">Pindala</span>
-                <span class="font-semibold text-tallinn-gray_dark">${listing.area} m²</span>
+              <div class="grid sm:grid-cols-2 gap-3 mb-4">
+                <div class="bg-tallinn-gray_light rounded p-3">
+                  <div class="text-xs text-tallinn-gray_medium">KM</div>
+                  <div class="font-semibold text-tallinn-gray_dark">${formatVat(listing.vat)}</div>
+                </div>
+                <div class="bg-tallinn-gray_light rounded p-3">
+                  <div class="text-xs text-tallinn-gray_medium">Kõrvalkulud</div>
+                  <div class="font-semibold text-tallinn-gray_dark">${listing.utilities || 'Täpsustamisel'}</div>
+                </div>
               </div>
-              <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
-                <span class="block text-xs text-tallinn-gray_medium">Korrus</span>
-                <span class="font-semibold text-tallinn-gray_dark">${floorLabel(listing.floor)}</span>
+
+              <div class="flex flex-wrap gap-2 mb-4">
+                ${listing.separateEntrance ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Eraldi sissepääs</span>' : ''}
+                ${listing.accessible ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ligipääsetav</span>' : ''}
+                ${listing.transport ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ühistransport lähedal</span>' : ''}
+                ${listing.parking ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Parkimine</span>' : ''}
+                ${listing.lift ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Lift</span>' : ''}
+                ${listing.access24h ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">24/7 ligipääs</span>' : ''}
+                ${listing.ventilation ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ventilatsioon</span>' : ''}
+                ${listing.kitchenette ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Kööginurk</span>' : ''}
+                ${listing.wc ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">WC</span>' : ''}
+                <span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ehitusaasta: ${listing.yearBuilt}</span>
               </div>
-              <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
-                <span class="block text-xs text-tallinn-gray_medium">€/m²</span>
-                <span class="font-semibold text-tallinn-gray_dark">${listing.pricePerSqm !== null ? `${listing.pricePerSqm} €` : 'Küsi hinda'}</span>
-              </div>
-              <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
-                <span class="block text-xs text-tallinn-gray_medium">€/kuu</span>
-                <span class="font-semibold text-tallinn-gray_dark">${euro(listing.priceMonth)}</span>
+
+              <div class="flex gap-3 mt-auto">
+                <button onclick="openDetailModal('${listing.id}')"
+                  class="flex-1 px-4 py-2.5 border-2 border-tallinn-primary text-tallinn-primary hover:bg-tallinn-primary hover:text-white rounded font-semibold text-sm transition">
+                  Vaata detaile
+                </button>
+                <button onclick="openContactModalWithProperty('${listing.id}')"
+                  class="flex-1 px-4 py-2.5 bg-tallinn-primary hover:bg-tallinn-secondary text-white rounded font-semibold text-sm transition">
+                  Esita päring
+                </button>
               </div>
             </div>
+          </article>
+        `;
+      }).join('');
 
-            <div class="grid sm:grid-cols-2 gap-3 mb-4">
-              <div class="bg-tallinn-gray_light rounded p-3">
-                <div class="text-xs text-tallinn-gray_medium">KM</div>
-                <div class="font-semibold text-tallinn-gray_dark">${formatVat(listing.vat)}</div>
-              </div>
-              <div class="bg-tallinn-gray_light rounded p-3">
-                <div class="text-xs text-tallinn-gray_medium">Kõrvalkulud</div>
-                <div class="font-semibold text-tallinn-gray_dark">${listing.utilities || 'Täpsustamisel'}</div>
-              </div>
-            </div>
-
-            <div class="flex flex-wrap gap-2 mb-4">
-              ${listing.separateEntrance ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Eraldi sissepääs</span>' : ''}
-              ${listing.accessible ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ligipääsetav</span>' : ''}
-              ${listing.transport ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ühistransport lähedal</span>' : ''}
-              ${listing.parking ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Parkimine</span>' : ''}
-              ${listing.lift ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Lift</span>' : ''}
-              ${listing.access24h ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">24/7 ligipääs</span>' : ''}
-              ${listing.ventilation ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ventilatsioon</span>' : ''}
-              ${listing.kitchenette ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Kööginurk</span>' : ''}
-              ${listing.wc ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">WC</span>' : ''}
-              <span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ehitusaasta: ${listing.yearBuilt}</span>
-            </div>
-
-            <div class="flex gap-3 mt-auto">
-              <button onclick="openDetailModal('${listing.id}')"
-                class="flex-1 px-4 py-2.5 border-2 border-tallinn-primary text-tallinn-primary hover:bg-tallinn-primary hover:text-white rounded font-semibold text-sm transition">
-                Vaata detaile
-              </button>
-              <button onclick="openContactModalWithProperty('${listing.id}')"
-                class="flex-1 px-4 py-2.5 bg-tallinn-primary hover:bg-tallinn-secondary text-white rounded font-semibold text-sm transition">
-                Esita päring
-              </button>
-            </div>
-          </div>
-        </article>
-      `).join('');
+      renderMap();
     }
 
     function toggleQuickFilter(filter) {
@@ -1446,6 +1673,7 @@
         mapBtn.classList.remove('text-tallinn-gray_medium');
         listBtn.classList.remove('bg-white','shadow','text-tallinn-primary');
         listBtn.classList.add('text-tallinn-gray_medium');
+        renderMap();
       }
     }
 
@@ -1457,11 +1685,8 @@
 
       document.getElementById('modal-content').innerHTML = `
         <div class="space-y-6">
-          <div class="bg-gradient-to-br from-tallinn-light to-tallinn-gray_light rounded h-56 flex items-center justify-center">
-            <div class="text-center">
-              <div class="text-tallinn-primary/40 text-5xl mb-2">🏢</div>
-              <span class="text-sm text-tallinn-gray_medium">Pilt puudub</span>
-            </div>
+          <div class="rounded overflow-hidden border border-tallinn-gray_border bg-slate-100">
+            <img src="${getListingImage(listing)}" alt="${listing.address}" class="w-full h-72 object-cover" />
           </div>
 
           <div>
