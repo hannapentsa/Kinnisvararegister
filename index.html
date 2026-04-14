@@ -17,9 +17,9 @@
         extend: {
           colors: {
             tallinn: {
-              primary: '#0072CE',   // Tallinna korrektne
-              secondary: '#005BA3', // tumedam (hover/gradient)
-              accent: '#0072CE',    // hoian sama, et kõik oleks ühtne
+              primary: '#0072CE',
+              secondary: '#005BA3',
+              accent: '#0072CE',
               light: '#E6F0F8',
               dark: '#1a1a1a',
               gray_dark: '#2C2C2C',
@@ -63,7 +63,10 @@
 
     .modal-overlay { backdrop-filter: blur(4px); }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     .animate-fade-in { animation: fadeIn 0.25s ease forwards; }
 
     .status-badge { font-size: 0.72rem; padding: 0.25rem 0.55rem; }
@@ -75,7 +78,6 @@
   <header class="bg-tallinn-white border-b border-tallinn-gray_border sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6">
       <div class="flex items-center justify-between h-16">
-        <!-- Logo -->
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 bg-tallinn-primary rounded flex items-center justify-center">
             <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -88,7 +90,6 @@
           </div>
         </div>
 
-        <!-- Desktop Nav -->
         <nav class="hidden lg:flex items-center gap-1">
           <a href="#listings" class="px-4 py-2 text-sm font-semibold text-tallinn-primary hover:bg-tallinn-light rounded transition">Vabad pinnad</a>
           <a href="#how-to" class="px-4 py-2 text-sm font-semibold text-tallinn-gray_dark hover:bg-tallinn-gray_light rounded transition">Kuidas üürida</a>
@@ -97,7 +98,6 @@
           <a href="#faq" class="px-4 py-2 text-sm font-semibold text-tallinn-gray_dark hover:bg-tallinn-gray_light rounded transition">KKK</a>
         </nav>
 
-        <!-- CTA + Mobile -->
         <div class="flex items-center gap-3">
           <button onclick="openContactModal()" id="header-cta"
             class="bg-tallinn-primary hover:bg-tallinn-secondary text-white px-5 py-2.5 rounded font-semibold text-sm shadow-md hover:shadow-lg transition hidden sm:flex items-center gap-2">
@@ -118,7 +118,6 @@
       </div>
     </div>
 
-    <!-- Mobile Menu -->
     <div id="mobile-menu" class="lg:hidden hidden border-t border-tallinn-gray_border bg-tallinn-white">
       <nav class="px-4 py-3 space-y-1">
         <a href="#listings" class="block px-4 py-2.5 text-sm font-semibold text-tallinn-primary bg-tallinn-light rounded">Vabad pinnad</a>
@@ -141,10 +140,9 @@
           Tallinna linna äripinnad üürile
         </h1>
         <p id="hero-subtitle" class="text-lg sm:text-xl text-white/85 mb-8 leading-relaxed">
-          Sirvi vabu ja peagi vabanevaid äripindu. Kui leiad sobiva, esita päring otse linnale.
+          Sirvi vabu ja peagi vabanevaid äripindu. Võrdle hindu, kulusid ja põhitingimusi ning esita päring otse linnale.
         </p>
 
-        <!-- Search -->
         <div class="bg-white rounded shadow-lg p-2 mb-6">
           <div class="flex flex-col sm:flex-row gap-2">
             <div class="flex-1 relative">
@@ -166,7 +164,6 @@
           </div>
         </div>
 
-        <!-- Quick filters -->
         <div class="flex flex-wrap gap-2">
           <button onclick="toggleQuickFilter('available')" data-filter="available"
             class="filter-chip bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm border border-white/30 flex items-center gap-2">
@@ -206,7 +203,7 @@
   <main id="listings" class="max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full">
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Filters -->
-      <aside class="lg:w-72 flex-shrink-0">
+      <aside class="lg:w-80 flex-shrink-0">
         <div class="bg-tallinn-white rounded shadow-sm border border-tallinn-gray_border p-5 lg:sticky lg:top-24 custom-scrollbar lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
           <div class="flex items-center justify-between mb-5">
             <h2 class="font-semibold text-lg text-tallinn-gray_dark">Filtrid</h2>
@@ -262,7 +259,21 @@
             </div>
           </div>
 
-          <!-- Price -->
+          <!-- Price month -->
+          <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
+            <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Kuuhind (€)</h3>
+            <div class="flex items-center gap-3">
+              <input type="number" id="month-price-min" placeholder="Min"
+                class="w-full px-3 py-2 text-sm border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none"
+                onchange="applyFilters()">
+              <span class="text-tallinn-gray_medium">–</span>
+              <input type="number" id="month-price-max" placeholder="Max"
+                class="w-full px-3 py-2 text-sm border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none"
+                onchange="applyFilters()">
+            </div>
+          </div>
+
+          <!-- Price sqm -->
           <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
             <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Hind (€/m²)</h3>
             <div class="flex items-center gap-3">
@@ -274,6 +285,17 @@
                 class="w-full px-3 py-2 text-sm border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none"
                 onchange="applyFilters()">
             </div>
+          </div>
+
+          <!-- VAT -->
+          <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
+            <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">KM</h3>
+            <select id="filter-vat" onchange="applyFilters()"
+              class="w-full px-3 py-2 text-sm border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
+              <option value="">Kõik</option>
+              <option value="lisandub">KM lisandub</option>
+              <option value="sisaldub">KM hinnas</option>
+            </select>
           </div>
 
           <!-- Purpose -->
@@ -373,6 +395,43 @@
             </div>
           </div>
 
+          <!-- Technical -->
+          <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
+            <h3 class="font-semibold text-sm text-tallinn-gray_dark mb-3">Mugavused ja tehniline info</h3>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" id="filter-parking" onchange="applyFilters()"
+                  class="w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Parkimine</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" id="filter-lift" onchange="applyFilters()"
+                  class="w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Lift</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" id="filter-access24h" onchange="applyFilters()"
+                  class="w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">24/7 ligipääs</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" id="filter-ventilation" onchange="applyFilters()"
+                  class="w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Ventilatsioon</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" id="filter-kitchenette" onchange="applyFilters()"
+                  class="w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">Kööginurk</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" id="filter-wc" onchange="applyFilters()"
+                  class="w-4 h-4 text-tallinn-primary border-tallinn-gray_border rounded focus:ring-tallinn-primary">
+                <span class="text-sm text-tallinn-gray_dark group-hover:text-tallinn-primary">WC olemas</span>
+              </label>
+            </div>
+          </div>
+
           <!-- Transport -->
           <div class="mb-5 pb-5 border-b border-tallinn-gray_border">
             <label class="flex items-center gap-2 cursor-pointer group">
@@ -405,12 +464,14 @@
             <p id="results-count" class="text-sm text-tallinn-gray_medium mt-1">0 kuulutust leitud</p>
           </div>
 
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-3 flex-wrap">
             <select id="sort-select" onchange="sortListings()"
               class="px-4 py-2 text-sm border border-tallinn-gray_border rounded focus:ring-2 focus:ring-tallinn-primary focus:border-transparent outline-none bg-white">
               <option value="newest">Uuemad enne</option>
-              <option value="price-asc">Hind ↑</option>
-              <option value="price-desc">Hind ↓</option>
+              <option value="price-month-asc">Kuuhind ↑</option>
+              <option value="price-month-desc">Kuuhind ↓</option>
+              <option value="price-sqm-asc">€/m² ↑</option>
+              <option value="price-sqm-desc">€/m² ↓</option>
               <option value="area-asc">Pindala ↑</option>
               <option value="area-desc">Pindala ↓</option>
               <option value="available">Vabanemise kuupäev</option>
@@ -487,7 +548,7 @@
           </div>
           <div class="w-8 h-8 bg-tallinn-primary text-white rounded-full flex items-center justify-center mx-auto mb-3 text-sm font-bold">2</div>
           <h3 class="font-semibold text-tallinn-gray_dark mb-2">Vali pind</h3>
-          <p class="text-sm text-tallinn-gray_medium">Vaata detaile ja vali sobiv pind</p>
+          <p class="text-sm text-tallinn-gray_medium">Vaata detaile, kulusid ja põhitingimusi</p>
         </div>
 
         <div class="text-center group">
@@ -669,7 +730,7 @@
             <span class="text-tallinn-gray_medium">▾</span>
           </button>
           <div class="hidden px-6 pb-4 text-tallinn-gray_medium">
-            Üürihind kujuneb lähtuvalt pinna asukohast, seisukorrast ja turutingimustest.
+            Üürihind kujuneb lähtuvalt pinna asukohast, seisukorrast, suurusest ja turutingimustest. Kuulutuses võib lisanduda ka KM ning kõrvalkulud.
           </div>
         </div>
 
@@ -679,7 +740,7 @@
             <span class="text-tallinn-gray_medium">▾</span>
           </button>
           <div class="hidden px-6 pb-4 text-tallinn-gray_medium">
-            Äripindade üürilepingud sõlmitakse tavaliselt mitmeks aastaks, täpsed tingimused lepitakse kokku.
+            Äripindade üürilepingud sõlmitakse tavaliselt mitmeks aastaks, täpsed tingimused lepitakse kokku konkreetse pinna ja üürniku vajaduste järgi.
           </div>
         </div>
       </div>
@@ -828,29 +889,266 @@
   </div>
 
   <script>
-    // Sample listings data
     const listings = [
-      { id:'TLN-0001', address:'Pärnu mnt 67', district:'Kesklinn', area:120, pricePerSqm:12, priceMonth:1440, purpose:'teenindus', condition:'valmis', availability:'kohe', availableDate:null, floor:'1', separateEntrance:true, accessible:true, transport:true, yearBuilt:2015, description:'Heas asukohas avar äripind suure vitriinakna ja eraldi sissepääsuga.' },
-      { id:'TLN-0002', address:'Telliskivi 60a', district:'Põhja-Tallinn', area:85, pricePerSqm:15, priceMonth:1275, purpose:'büroo', condition:'valmis', availability:'kohe', availableDate:null, floor:'2', separateEntrance:false, accessible:false, transport:true, yearBuilt:1920, description:'Atmosfäärne büroopind Telliskivi loomelinnakus. Renoveeritud ruumid.' },
-      { id:'TLN-0003', address:'Viru tn 15', district:'Kesklinn', area:200, pricePerSqm:25, priceMonth:5000, purpose:'kaubandus', condition:'valmis', availability:'peagi', availableDate:'15.03.2025', floor:'1', separateEntrance:true, accessible:true, transport:true, yearBuilt:2008, description:'Premium asukoht Viru tänaval. Suurepärane nähtavus ja jalakäijate voog.' },
-      { id:'TLN-0004', address:'Mustamäe tee 55', district:'Mustamäe', area:450, pricePerSqm:5, priceMonth:2250, purpose:'ladu', condition:'remont', availability:'kohe', availableDate:null, floor:'1', separateEntrance:true, accessible:true, transport:false, yearBuilt:1975, description:'Suur laopind. Vajab renoveerimist. Võimalus kujundada vastavalt vajadustele.' },
-      { id:'TLN-0005', address:'Rataskaevu 16', district:'Kesklinn', area:95, pricePerSqm:null, priceMonth:null, purpose:'toitlustus', condition:'osaliselt', availability:'peagi', availableDate:'01.06.2025', floor:'1', separateEntrance:true, accessible:false, transport:true, yearBuilt:1880, description:'Vanalinna südames ajalooline pind. Sobib kohvikuks/restoraniks.' },
-      { id:'TLN-0006', address:'Sõpruse pst 201', district:'Lasnamäe', area:180, pricePerSqm:7, priceMonth:1260, purpose:'teenindus', condition:'remont', availability:'kohe', availableDate:null, floor:'1', separateEntrance:true, accessible:true, transport:true, yearBuilt:1985, description:'Suur äripind tihedas elupiirkonnas. Vajab renoveerimist.' },
-      { id:'TLN-0007', address:'Kopli 25', district:'Põhja-Tallinn', area:65, pricePerSqm:10, priceMonth:650, purpose:'büroo', condition:'valmis', availability:'peagi', availableDate:'01.04.2025', floor:'3', separateEntrance:false, accessible:false, transport:true, yearBuilt:2020, description:'Kompaktne ja kaasaegne büroopind. Ideaalne väikeettevõttele.' },
-      { id:'TLN-0008', address:'Kristiine 1', district:'Kristiine', area:320, pricePerSqm:9, priceMonth:2880, purpose:'kaubandus', condition:'valmis', availability:'kohe', availableDate:null, floor:'1', separateEntrance:true, accessible:true, transport:true, yearBuilt:2005, description:'Suur kaubanduspind. Hea ligipääsetavus ja nähtavus magistraali ääres.' }
+      {
+        id:'TLN-0001',
+        address:'Pärnu mnt 67',
+        district:'Kesklinn',
+        area:120,
+        pricePerSqm:12,
+        priceMonth:1440,
+        vat:'lisandub',
+        utilities:'al 2.8 €/m²',
+        purpose:'teenindus',
+        condition:'valmis',
+        availability:'kohe',
+        availableDate:null,
+        publishedAt:'2026-04-10',
+        floor:'1',
+        separateEntrance:true,
+        accessible:true,
+        transport:true,
+        parking:true,
+        lift:false,
+        access24h:true,
+        ventilation:true,
+        kitchenette:true,
+        wc:true,
+        yearBuilt:2015,
+        description:'Heas asukohas avar äripind suure vitriinakna ja eraldi sissepääsuga.'
+      },
+      {
+        id:'TLN-0002',
+        address:'Telliskivi 60a',
+        district:'Põhja-Tallinn',
+        area:85,
+        pricePerSqm:15,
+        priceMonth:1275,
+        vat:'lisandub',
+        utilities:'al 3.2 €/m²',
+        purpose:'büroo',
+        condition:'valmis',
+        availability:'kohe',
+        availableDate:null,
+        publishedAt:'2026-04-12',
+        floor:'2',
+        separateEntrance:false,
+        accessible:false,
+        transport:true,
+        parking:true,
+        lift:true,
+        access24h:true,
+        ventilation:true,
+        kitchenette:true,
+        wc:true,
+        yearBuilt:1920,
+        description:'Atmosfäärne büroopind Telliskivi loomelinnakus. Renoveeritud ruumid.'
+      },
+      {
+        id:'TLN-0003',
+        address:'Viru tn 15',
+        district:'Kesklinn',
+        area:200,
+        pricePerSqm:25,
+        priceMonth:5000,
+        vat:'lisandub',
+        utilities:'kokkuleppel',
+        purpose:'kaubandus',
+        condition:'valmis',
+        availability:'peagi',
+        availableDate:'2026-05-15',
+        publishedAt:'2026-04-08',
+        floor:'1',
+        separateEntrance:true,
+        accessible:true,
+        transport:true,
+        parking:false,
+        lift:false,
+        access24h:false,
+        ventilation:true,
+        kitchenette:false,
+        wc:true,
+        yearBuilt:2008,
+        description:'Premium asukoht Viru tänaval. Suurepärane nähtavus ja jalakäijate voog.'
+      },
+      {
+        id:'TLN-0004',
+        address:'Mustamäe tee 55',
+        district:'Mustamäe',
+        area:450,
+        pricePerSqm:5,
+        priceMonth:2250,
+        vat:'lisandub',
+        utilities:'al 1.9 €/m²',
+        purpose:'ladu',
+        condition:'remont',
+        availability:'kohe',
+        availableDate:null,
+        publishedAt:'2026-04-03',
+        floor:'1',
+        separateEntrance:true,
+        accessible:true,
+        transport:false,
+        parking:true,
+        lift:false,
+        access24h:true,
+        ventilation:false,
+        kitchenette:false,
+        wc:true,
+        yearBuilt:1975,
+        description:'Suur laopind. Vajab renoveerimist. Võimalus kujundada vastavalt vajadustele.'
+      },
+      {
+        id:'TLN-0005',
+        address:'Rataskaevu 16',
+        district:'Kesklinn',
+        area:95,
+        pricePerSqm:null,
+        priceMonth:null,
+        vat:'lisandub',
+        utilities:'küsi täpsustust',
+        purpose:'toitlustus',
+        condition:'osaliselt',
+        availability:'peagi',
+        availableDate:'2026-06-01',
+        publishedAt:'2026-04-01',
+        floor:'1',
+        separateEntrance:true,
+        accessible:false,
+        transport:true,
+        parking:false,
+        lift:false,
+        access24h:false,
+        ventilation:true,
+        kitchenette:true,
+        wc:true,
+        yearBuilt:1880,
+        description:'Vanalinna südames ajalooline pind. Sobib kohvikuks/restoraniks.'
+      },
+      {
+        id:'TLN-0006',
+        address:'Sõpruse pst 201',
+        district:'Lasnamäe',
+        area:180,
+        pricePerSqm:7,
+        priceMonth:1260,
+        vat:'lisandub',
+        utilities:'al 2.4 €/m²',
+        purpose:'teenindus',
+        condition:'remont',
+        availability:'kohe',
+        availableDate:null,
+        publishedAt:'2026-04-11',
+        floor:'1',
+        separateEntrance:true,
+        accessible:true,
+        transport:true,
+        parking:true,
+        lift:false,
+        access24h:true,
+        ventilation:true,
+        kitchenette:false,
+        wc:true,
+        yearBuilt:1985,
+        description:'Suur äripind tihedas elupiirkonnas. Vajab renoveerimist.'
+      },
+      {
+        id:'TLN-0007',
+        address:'Kopli 25',
+        district:'Põhja-Tallinn',
+        area:65,
+        pricePerSqm:10,
+        priceMonth:650,
+        vat:'sisaldub',
+        utilities:'al 2.1 €/m²',
+        purpose:'büroo',
+        condition:'valmis',
+        availability:'peagi',
+        availableDate:'2026-05-01',
+        publishedAt:'2026-04-09',
+        floor:'3',
+        separateEntrance:false,
+        accessible:false,
+        transport:true,
+        parking:false,
+        lift:true,
+        access24h:true,
+        ventilation:true,
+        kitchenette:true,
+        wc:true,
+        yearBuilt:2020,
+        description:'Kompaktne ja kaasaegne büroopind. Ideaalne väikeettevõttele.'
+      },
+      {
+        id:'TLN-0008',
+        address:'Kristiine 1',
+        district:'Kristiine',
+        area:320,
+        pricePerSqm:9,
+        priceMonth:2880,
+        vat:'lisandub',
+        utilities:'al 2.7 €/m²',
+        purpose:'kaubandus',
+        condition:'valmis',
+        availability:'kohe',
+        availableDate:null,
+        publishedAt:'2026-04-13',
+        floor:'1',
+        separateEntrance:true,
+        accessible:true,
+        transport:true,
+        parking:true,
+        lift:true,
+        access24h:false,
+        ventilation:true,
+        kitchenette:true,
+        wc:true,
+        yearBuilt:2005,
+        description:'Suur kaubanduspind. Hea ligipääsetavus ja nähtavus magistraali ääres.'
+      }
     ];
 
     let filteredListings = [...listings];
     let activeQuickFilters = new Set();
     let currentView = 'list';
 
-    function euro(v){ return (v === null || v === undefined) ? 'Küsi hinda' : `${v} €`; }
+    function euro(v) {
+      return (v === null || v === undefined) ? 'Küsi hinda' : `${v} €`;
+    }
+
+    function formatVat(v) {
+      if (v === 'sisaldub') return 'KM hinnas';
+      if (v === 'lisandub') return 'KM lisandub';
+      return 'KM info puudub';
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return '—';
+      const d = new Date(dateString);
+      return Number.isNaN(d.getTime()) ? dateString : d.toLocaleDateString('et-EE');
+    }
+
+    function floorLabel(floor) {
+      if (floor === 'kelder') return 'Kelder';
+      return `${floor}. korrus`;
+    }
 
     function renderListings() {
       const grid = document.getElementById('listings-grid');
       const countEl = document.getElementById('results-count');
 
       countEl.textContent = `${filteredListings.length} kuulutust leitud`;
+
+      if (filteredListings.length === 0) {
+        grid.innerHTML = `
+          <div class="bg-tallinn-white rounded shadow-sm border border-tallinn-gray_border p-10 text-center">
+            <div class="text-5xl mb-4">🔎</div>
+            <h3 class="text-xl font-semibold text-tallinn-gray_dark mb-2">Sobivaid pindu ei leitud</h3>
+            <p class="text-tallinn-gray_medium">Muuda filtreid või tühjenda need, et näha rohkem tulemusi.</p>
+          </div>
+        `;
+        return;
+      }
 
       grid.innerHTML = filteredListings.map(listing => `
         <article class="listing-card bg-tallinn-white rounded shadow-sm border border-tallinn-gray_border overflow-hidden flex flex-col sm:flex-row">
@@ -866,7 +1164,7 @@
               ${
                 listing.availability === 'kohe'
                   ? '<span class="status-badge bg-tallinn-primary text-white rounded-full font-semibold">Kohe vaba</span>'
-                  : `<span class="status-badge bg-tallinn-secondary text-white rounded-full font-semibold">Vabaneb ${listing.availableDate}</span>`
+                  : `<span class="status-badge bg-tallinn-secondary text-white rounded-full font-semibold">Vabaneb ${formatDate(listing.availableDate)}</span>`
               }
               ${listing.condition === 'remont' ? '<span class="status-badge bg-orange-600 text-white rounded-full font-semibold">Remonti vajab</span>' : ''}
               ${listing.condition === 'osaliselt' ? '<span class="status-badge bg-blue-600 text-white rounded-full font-semibold">Osaliselt renoveeritud</span>' : ''}
@@ -892,15 +1190,26 @@
               </div>
               <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
                 <span class="block text-xs text-tallinn-gray_medium">Korrus</span>
-                <span class="font-semibold text-tallinn-gray_dark">${listing.floor}. korrus</span>
+                <span class="font-semibold text-tallinn-gray_dark">${floorLabel(listing.floor)}</span>
               </div>
               <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
                 <span class="block text-xs text-tallinn-gray_medium">€/m²</span>
-                <span class="font-semibold text-tallinn-gray_dark">${listing.pricePerSqm ? euro(listing.pricePerSqm) : 'Küsi hinda'}</span>
+                <span class="font-semibold text-tallinn-gray_dark">${listing.pricePerSqm !== null ? `${listing.pricePerSqm} €` : 'Küsi hinda'}</span>
               </div>
               <div class="bg-tallinn-gray_light rounded p-2.5 text-center">
                 <span class="block text-xs text-tallinn-gray_medium">€/kuu</span>
-                <span class="font-semibold text-tallinn-gray_dark">${listing.priceMonth ? euro(listing.priceMonth) : 'Küsi hinda'}</span>
+                <span class="font-semibold text-tallinn-gray_dark">${euro(listing.priceMonth)}</span>
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-3 mb-4">
+              <div class="bg-tallinn-gray_light rounded p-3">
+                <div class="text-xs text-tallinn-gray_medium">KM</div>
+                <div class="font-semibold text-tallinn-gray_dark">${formatVat(listing.vat)}</div>
+              </div>
+              <div class="bg-tallinn-gray_light rounded p-3">
+                <div class="text-xs text-tallinn-gray_medium">Kõrvalkulud</div>
+                <div class="font-semibold text-tallinn-gray_dark">${listing.utilities || 'Täpsustamisel'}</div>
               </div>
             </div>
 
@@ -908,6 +1217,12 @@
               ${listing.separateEntrance ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Eraldi sissepääs</span>' : ''}
               ${listing.accessible ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ligipääsetav</span>' : ''}
               ${listing.transport ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ühistransport lähedal</span>' : ''}
+              ${listing.parking ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Parkimine</span>' : ''}
+              ${listing.lift ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Lift</span>' : ''}
+              ${listing.access24h ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">24/7 ligipääs</span>' : ''}
+              ${listing.ventilation ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ventilatsioon</span>' : ''}
+              ${listing.kitchenette ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Kööginurk</span>' : ''}
+              ${listing.wc ? '<span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">WC</span>' : ''}
               <span class="text-xs bg-tallinn-gray_light text-tallinn-gray_medium px-2 py-1 rounded">Ehitusaasta: ${listing.yearBuilt}</span>
             </div>
 
@@ -941,11 +1256,14 @@
     }
 
     function applyFilters() {
-      const searchTerm = (document.getElementById('search-input').value || '').toLowerCase();
+      const searchTerm = (document.getElementById('search-input').value || '').toLowerCase().trim();
       const areaMin = parseInt(document.getElementById('area-min').value) || 0;
       const areaMax = parseInt(document.getElementById('area-max').value) || Infinity;
+      const monthPriceMin = parseInt(document.getElementById('month-price-min').value) || 0;
+      const monthPriceMax = parseInt(document.getElementById('month-price-max').value) || Infinity;
       const priceMin = parseInt(document.getElementById('price-min').value) || 0;
       const priceMax = parseInt(document.getElementById('price-max').value) || Infinity;
+      const vat = document.getElementById('filter-vat').value;
 
       const selectedDistricts = [...document.querySelectorAll('.filter-district:checked')].map(el => el.value);
       const selectedPurposes = [...document.querySelectorAll('.filter-purpose:checked')].map(el => el.value);
@@ -956,14 +1274,25 @@
       const separateEntrance = document.getElementById('filter-separate-entrance').checked;
       const accessible = document.getElementById('filter-accessible').checked;
       const transport = document.getElementById('filter-transport').checked;
+      const parking = document.getElementById('filter-parking').checked;
+      const lift = document.getElementById('filter-lift').checked;
+      const access24h = document.getElementById('filter-access24h').checked;
+      const ventilation = document.getElementById('filter-ventilation').checked;
+      const kitchenette = document.getElementById('filter-kitchenette').checked;
+      const wc = document.getElementById('filter-wc').checked;
       const yearBuilt = document.getElementById('filter-year').value;
 
       filteredListings = listings.filter(listing => {
-        if (searchTerm &&
-          !listing.address.toLowerCase().includes(searchTerm) &&
-          !listing.district.toLowerCase().includes(searchTerm) &&
-          !listing.description.toLowerCase().includes(searchTerm)
-        ) return false;
+        const searchableText = [
+          listing.address,
+          listing.district,
+          listing.description,
+          listing.purpose,
+          listing.utilities,
+          listing.id
+        ].join(' ').toLowerCase();
+
+        if (searchTerm && !searchableText.includes(searchTerm)) return false;
 
         if (activeQuickFilters.has('available') && listing.availability !== 'kohe') return false;
         if (activeQuickFilters.has('upcoming') && listing.availability !== 'peagi') return false;
@@ -974,23 +1303,38 @@
 
         if (listing.area < areaMin || listing.area > areaMax) return false;
 
-        if (listing.pricePerSqm !== null && listing.pricePerSqm !== undefined) {
-          if (listing.pricePerSqm < priceMin || listing.pricePerSqm > priceMax) return false;
+        if (listing.priceMonth !== null && listing.priceMonth !== undefined) {
+          if (listing.priceMonth < monthPriceMin || listing.priceMonth > monthPriceMax) return false;
+        } else if (monthPriceMin > 0 || monthPriceMax < Infinity) {
+          return false;
         }
 
+        if (listing.pricePerSqm !== null && listing.pricePerSqm !== undefined) {
+          if (listing.pricePerSqm < priceMin || listing.pricePerSqm > priceMax) return false;
+        } else if (priceMin > 0 || priceMax < Infinity) {
+          return false;
+        }
+
+        if (vat && listing.vat !== vat) return false;
         if (selectedDistricts.length > 0 && !selectedDistricts.some(d => listing.district.toLowerCase().includes(d))) return false;
         if (selectedPurposes.length > 0 && !selectedPurposes.includes(listing.purpose)) return false;
         if (selectedConditions.length > 0 && !selectedConditions.includes(listing.condition)) return false;
         if (selectedAvailability.length > 0 && !selectedAvailability.includes(listing.availability)) return false;
 
         if (floor) {
-          if (floor === '3+' && parseInt(listing.floor) < 3) return false;
+          if (floor === '3+' && parseInt(listing.floor, 10) < 3) return false;
           if (floor !== '3+' && listing.floor !== floor) return false;
         }
 
         if (separateEntrance && !listing.separateEntrance) return false;
         if (accessible && !listing.accessible) return false;
         if (transport && !listing.transport) return false;
+        if (parking && !listing.parking) return false;
+        if (lift && !listing.lift) return false;
+        if (access24h && !listing.access24h) return false;
+        if (ventilation && !listing.ventilation) return false;
+        if (kitchenette && !listing.kitchenette) return false;
+        if (wc && !listing.wc) return false;
 
         if (yearBuilt) {
           const y = listing.yearBuilt;
@@ -1007,21 +1351,35 @@
       renderListings();
     }
 
-    function applySearch() { applyFilters(); }
+    function applySearch() {
+      applyFilters();
+    }
 
     function clearAllFilters() {
       document.getElementById('search-input').value = '';
       document.getElementById('area-min').value = '';
       document.getElementById('area-max').value = '';
+      document.getElementById('month-price-min').value = '';
+      document.getElementById('month-price-max').value = '';
       document.getElementById('price-min').value = '';
       document.getElementById('price-max').value = '';
       document.getElementById('filter-floor').value = '';
       document.getElementById('filter-year').value = '';
+      document.getElementById('filter-vat').value = '';
+
       document.getElementById('filter-separate-entrance').checked = false;
       document.getElementById('filter-accessible').checked = false;
       document.getElementById('filter-transport').checked = false;
+      document.getElementById('filter-parking').checked = false;
+      document.getElementById('filter-lift').checked = false;
+      document.getElementById('filter-access24h').checked = false;
+      document.getElementById('filter-ventilation').checked = false;
+      document.getElementById('filter-kitchenette').checked = false;
+      document.getElementById('filter-wc').checked = false;
 
-      document.querySelectorAll('.filter-district, .filter-purpose, .filter-condition, .filter-availability').forEach(el => el.checked = false);
+      document.querySelectorAll('.filter-district, .filter-purpose, .filter-condition, .filter-availability').forEach(el => {
+        el.checked = false;
+      });
 
       activeQuickFilters.clear();
       document.querySelectorAll('.filter-chip').forEach(btn => {
@@ -1030,22 +1388,41 @@
       });
 
       filteredListings = [...listings];
+      document.getElementById('sort-select').value = 'newest';
       sortListings(true);
       renderListings();
     }
 
-    function sortListings(silent=false) {
+    function sortListings(silent = false) {
       const sortBy = document.getElementById('sort-select').value;
-      filteredListings.sort((a,b) => {
-        switch(sortBy) {
-          case 'price-asc':  return (a.pricePerSqm ?? Infinity) - (b.pricePerSqm ?? Infinity);
-          case 'price-desc': return (b.pricePerSqm ?? -Infinity) - (a.pricePerSqm ?? -Infinity);
-          case 'area-asc':   return a.area - b.area;
-          case 'area-desc':  return b.area - a.area;
-          case 'available':  return (a.availability === 'kohe' ? 0 : 1) - (b.availability === 'kohe' ? 0 : 1);
-          default: return 0;
+
+      filteredListings.sort((a, b) => {
+        switch (sortBy) {
+          case 'price-month-asc':
+            return (a.priceMonth ?? Infinity) - (b.priceMonth ?? Infinity);
+          case 'price-month-desc':
+            return (b.priceMonth ?? -Infinity) - (a.priceMonth ?? -Infinity);
+          case 'price-sqm-asc':
+            return (a.pricePerSqm ?? Infinity) - (b.pricePerSqm ?? Infinity);
+          case 'price-sqm-desc':
+            return (b.pricePerSqm ?? -Infinity) - (a.pricePerSqm ?? -Infinity);
+          case 'area-asc':
+            return a.area - b.area;
+          case 'area-desc':
+            return b.area - a.area;
+          case 'available': {
+            const availabilityValue = item => {
+              if (item.availability === 'kohe') return 0;
+              return item.availableDate ? new Date(item.availableDate).getTime() : Number.MAX_SAFE_INTEGER;
+            };
+            return availabilityValue(a) - availabilityValue(b);
+          }
+          case 'newest':
+          default:
+            return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
         }
       });
+
       if (!silent) renderListings();
     }
 
@@ -1075,21 +1452,86 @@
     function openDetailModal(id) {
       const listing = listings.find(l => l.id === id);
       if (!listing) return;
+
       document.getElementById('modal-title').textContent = `${listing.address} (${listing.id})`;
+
       document.getElementById('modal-content').innerHTML = `
-        <div class="space-y-4">
-          <p class="text-tallinn-gray_medium">${listing.description}</p>
-          <div class="grid sm:grid-cols-2 gap-3">
-            <div class="bg-tallinn-gray_light rounded p-3"><div class="text-xs text-tallinn-gray_medium">Linnaosa</div><div class="font-semibold">${listing.district}</div></div>
-            <div class="bg-tallinn-gray_light rounded p-3"><div class="text-xs text-tallinn-gray_medium">Pindala</div><div class="font-semibold">${listing.area} m²</div></div>
-            <div class="bg-tallinn-gray_light rounded p-3"><div class="text-xs text-tallinn-gray_medium">Ehitusaasta</div><div class="font-semibold">${listing.yearBuilt}</div></div>
-            <div class="bg-tallinn-gray_light rounded p-3"><div class="text-xs text-tallinn-gray_medium">Saadavus</div><div class="font-semibold">${listing.availability === 'kohe' ? 'Kohe vaba' : 'Vabaneb: ' + listing.availableDate}</div></div>
+        <div class="space-y-6">
+          <div class="bg-gradient-to-br from-tallinn-light to-tallinn-gray_light rounded h-56 flex items-center justify-center">
+            <div class="text-center">
+              <div class="text-tallinn-primary/40 text-5xl mb-2">🏢</div>
+              <span class="text-sm text-tallinn-gray_medium">Pilt puudub</span>
+            </div>
           </div>
+
+          <div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-3 py-1 bg-tallinn-light text-tallinn-primary text-xs font-semibold rounded capitalize">${listing.purpose}</span>
+              <span class="px-3 py-1 bg-tallinn-gray_light text-tallinn-gray_medium text-xs font-semibold rounded">${formatVat(listing.vat)}</span>
+              ${listing.availability === 'kohe'
+                ? '<span class="px-3 py-1 bg-tallinn-primary text-white text-xs font-semibold rounded">Kohe vaba</span>'
+                : `<span class="px-3 py-1 bg-tallinn-secondary text-white text-xs font-semibold rounded">Vabaneb ${formatDate(listing.availableDate)}</span>`
+              }
+            </div>
+            <p class="text-tallinn-gray_medium">${listing.description}</p>
+          </div>
+
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="bg-tallinn-gray_light rounded p-3">
+              <div class="text-xs text-tallinn-gray_medium">Linnaosa</div>
+              <div class="font-semibold">${listing.district}</div>
+            </div>
+            <div class="bg-tallinn-gray_light rounded p-3">
+              <div class="text-xs text-tallinn-gray_medium">Pindala</div>
+              <div class="font-semibold">${listing.area} m²</div>
+            </div>
+            <div class="bg-tallinn-gray_light rounded p-3">
+              <div class="text-xs text-tallinn-gray_medium">€/m²</div>
+              <div class="font-semibold">${listing.pricePerSqm !== null ? `${listing.pricePerSqm} €` : 'Küsi hinda'}</div>
+            </div>
+            <div class="bg-tallinn-gray_light rounded p-3">
+              <div class="text-xs text-tallinn-gray_medium">€/kuu</div>
+              <div class="font-semibold">${euro(listing.priceMonth)}</div>
+            </div>
+            <div class="bg-tallinn-gray_light rounded p-3">
+              <div class="text-xs text-tallinn-gray_medium">Kõrvalkulud</div>
+              <div class="font-semibold">${listing.utilities || 'Täpsustamisel'}</div>
+            </div>
+            <div class="bg-tallinn-gray_light rounded p-3">
+              <div class="text-xs text-tallinn-gray_medium">Korrus</div>
+              <div class="font-semibold">${floorLabel(listing.floor)}</div>
+            </div>
+            <div class="bg-tallinn-gray_light rounded p-3">
+              <div class="text-xs text-tallinn-gray_medium">Ehitusaasta</div>
+              <div class="font-semibold">${listing.yearBuilt}</div>
+            </div>
+            <div class="bg-tallinn-gray_light rounded p-3">
+              <div class="text-xs text-tallinn-gray_medium">Lisatud</div>
+              <div class="font-semibold">${formatDate(listing.publishedAt)}</div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="font-semibold text-lg text-tallinn-gray_dark mb-3">Põhiomadused</h3>
+            <div class="flex flex-wrap gap-2">
+              ${listing.separateEntrance ? '<span class="text-sm bg-tallinn-gray_light text-tallinn-gray_dark px-3 py-1.5 rounded">Eraldi sissepääs</span>' : ''}
+              ${listing.accessible ? '<span class="text-sm bg-tallinn-gray_light text-tallinn-gray_dark px-3 py-1.5 rounded">Ligipääsetav</span>' : ''}
+              ${listing.transport ? '<span class="text-sm bg-tallinn-gray_light text-tallinn-gray_dark px-3 py-1.5 rounded">Ühistransport lähedal</span>' : ''}
+              ${listing.parking ? '<span class="text-sm bg-tallinn-gray_light text-tallinn-gray_dark px-3 py-1.5 rounded">Parkimine</span>' : ''}
+              ${listing.lift ? '<span class="text-sm bg-tallinn-gray_light text-tallinn-gray_dark px-3 py-1.5 rounded">Lift</span>' : ''}
+              ${listing.access24h ? '<span class="text-sm bg-tallinn-gray_light text-tallinn-gray_dark px-3 py-1.5 rounded">24/7 ligipääs</span>' : ''}
+              ${listing.ventilation ? '<span class="text-sm bg-tallinn-gray_light text-tallinn-gray_dark px-3 py-1.5 rounded">Ventilatsioon</span>' : ''}
+              ${listing.kitchenette ? '<span class="text-sm bg-tallinn-gray_light text-tallinn-gray_dark px-3 py-1.5 rounded">Kööginurk</span>' : ''}
+              ${listing.wc ? '<span class="text-sm bg-tallinn-gray_light text-tallinn-gray_dark px-3 py-1.5 rounded">WC olemas</span>' : ''}
+            </div>
+          </div>
+
           <button onclick="openContactModalWithProperty('${listing.id}')" class="w-full bg-tallinn-primary hover:bg-tallinn-secondary text-white py-3 px-6 rounded font-semibold transition">
             Esita üüripäring
           </button>
         </div>
       `;
+
       document.getElementById('detail-modal').classList.remove('hidden');
       document.body.style.overflow = 'hidden';
     }
@@ -1113,7 +1555,6 @@
     function closeContactModal() {
       document.getElementById('contact-modal').classList.add('hidden');
       document.body.style.overflow = '';
-      // reset modal success if needed
       document.getElementById('modal-contact-form').classList.remove('hidden');
       document.getElementById('modal-form-success').classList.add('hidden');
     }
@@ -1139,7 +1580,7 @@
       content.classList.toggle('hidden');
     }
 
-    // init
+    sortListings(true);
     renderListings();
   </script>
 </body>
